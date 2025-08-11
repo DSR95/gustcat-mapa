@@ -1,1205 +1,1021 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GustCat - Descobreix els Sabors de Catalunya</title>
+function App() {
+  const [activeTab, setActiveTab] = React.useState('inici');
+  const [businesses, setBusinesses] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [formData, setFormData] = React.useState({
+    nom: '',
+    descripcio: '',
+    categoria: '',
+    adresa: '',
+    telefon: '',
+    email: '',
+    web: '',
+    horaris: '',
+    productes: ''
+  });
+
+  // CONNEXIÓ AMB GOOGLE SPREADSHEET - ID: 13VYRIhwm5n-vvWC6MtTvuxA_p3NECTPofIExsbvIsAY
+  React.useEffect(() => {
+    const loadBusinessData = async () => {
+      try {
+        const SHEET_ID = '13VYRIhwm5n-vvWC6MtTvuxA_p3NECTPofIExsbvIsAY';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+        
+        const response = await fetch(SHEET_URL);
+        const csvText = await response.text();
+        
+        // Convertir CSV a array d'objectes
+        const lines = csvText.split('\n');
+        const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
+        
+        const businessData = [];
+        for (let i = 1; i < lines.length; i++) {
+          if (lines[i].trim()) {
+            const values = lines[i].split(',').map(value => value.trim().replace(/"/g, ''));
+            const business = {};
+            headers.forEach((header, index) => {
+              business[header] = values[index] || '';
+            });
+            businessData.push(business);
+          }
+        }
+        
+        setBusinesses(businessData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error carregant dades del spreadsheet:', error);
+        setBusinesses([]);
+        setLoading(false);
+      }
+    };
+
+    loadBusinessData();
+  }, []);
+
+  // GESTIÓ DEL FORMULARI D'AFEGIR COMERÇ
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
     
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #8B4513;
-            --secondary-color: #D2691E;
-            --accent-color: #FF6B35;
-            --text-dark: #2C1810;
-            --text-light: #6B4423;
-            --bg-light: #FFF8F3;
-            --bg-cream: #F5E6D3;
-            --border-color: #E8D5C4;
-            --success: #4CAF50;
-            --shadow: 0 2px 10px rgba(139, 69, 19, 0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
-        }
-
-        .logo i {
-            font-size: 2rem;
-            color: var(--accent-color);
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        nav a:hover {
-            color: var(--accent-color);
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-block;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .btn-primary:hover {
-            background-color: #FF8C42;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(139, 69, 19, 0.7), rgba(210, 105, 30, 0.7)),
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23FFF8F3" width="1200" height="600"/><path fill="%23F5E6D3" d="M0 300L50 325L100 300L150 275L200 300L250 325L300 300L350 275L400 300L450 325L500 300L550 275L600 300L650 325L700 300L750 275L800 300L850 325L900 300L950 275L1000 300L1050 325L1100 300L1150 275L1200 300V600H0V300Z"/></svg>');
-            background-size: cover;
-            background-position: center;
-            padding: 4rem 2rem;
-            text-align: center;
-            color: white;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Search Section */
-        .search-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            margin: -2rem auto 3rem;
-            max-width: 1200px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .search-container {
-            display: grid;
-            grid-template-columns: 1fr 200px 200px 200px auto;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .search-input {
-            padding: 0.8rem 1.2rem;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        select {
-            padding: 0.8rem;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background: white;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        /* Map Container */
-        .map-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .filters-sidebar {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
-
-        .filter-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-section h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .filter-section h3 i {
-            font-size: 1rem;
-        }
-
-        .category-filters {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .category-filter {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .category-filter:hover {
-            background: var(--bg-cream);
-        }
-
-        .category-filter input[type="checkbox"] {
-            margin-right: 0.8rem;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .category-filter label {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
-        }
-
-        .category-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: var(--bg-cream);
-            font-size: 0.8rem;
-        }
-
-        #map {
-            height: 600px;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            background: var(--bg-cream);
-        }
-
-        /* Commerce Cards */
-        .results-section {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem 3rem;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .results-header h2 {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-        }
-
-        .results-count {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .commerce-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .commerce-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-        }
-
-        .commerce-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(139, 69, 19, 0.2);
-        }
-
-        .commerce-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 1.5rem;
-        }
-
-        .commerce-header h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .commerce-location {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .commerce-body {
-            padding: 1.5rem;
-        }
-
-        .commerce-description {
-            color: var(--text-light);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        .product-showcase {
-            background: var(--bg-cream);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .product-showcase h4 {
-            color: var(--primary-color);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .product-showcase p {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-
-        .commerce-footer {
-            padding: 1rem 1.5rem;
-            background: var(--bg-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .commerce-category {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 15px;
-            font-size: 0.85rem;
-        }
-
-        .commerce-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-
-        .action-btn:hover {
-            color: var(--accent-color);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--text-dark);
-            color: white;
-            padding: 3rem 2rem 1rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3 {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-section a:hover {
-            color: var(--accent-color);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid #444;
-            color: #999;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .search-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 968px) {
-            .map-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .filters-sidebar {
-                position: static;
-                margin-bottom: 2rem;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .commerce-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-        }
-
-        /* Popup Styles */
-        .leaflet-popup-content {
-            margin: 0;
-            padding: 0;
-            min-width: 250px;
-        }
-
-        .popup-content {
-            padding: 1rem;
-        }
-
-        .popup-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 0.8rem;
-            margin: -1px -1px 0.8rem -1px;
-        }
-
-        .popup-header h4 {
-            margin: 0;
-            font-size: 1.1rem;
-        }
-
-        .popup-category {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            font-size: 0.75rem;
-            margin-top: 0.3rem;
-        }
-
-        .popup-product {
-            background: var(--bg-cream);
-            padding: 0.5rem;
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .popup-product strong {
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 0.2rem;
-        }
-
-        .popup-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-
-        .popup-btn {
-            flex: 1;
-            padding: 0.4rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
-
-        .popup-btn-primary {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .popup-btn-primary:hover {
-            background: #FF8C42;
-        }
-
-        .popup-btn-secondary {
-            background: var(--border-color);
-            color: var(--text-dark);
-        }
-
-        .popup-btn-secondary:hover {
-            background: var(--bg-cream);
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <a href="#" class="logo">
-                <i class="fas fa-utensils"></i>
-                GustCat
-            </a>
-            <nav>
-                <ul>
-                    <li><a href="#map">Mapa</a></li>
-                    <li><a href="#comercos">Comerços</a></li>
-                    <li><a href="#categories">Categories</a></li>
-                    <li><a href="#sobre">Sobre Nosaltres</a></li>
-                    <li><a href="#" class="btn-primary">Afegeix el teu Comerç</a></li>
-                </ul>
-            </nav>
+    const emailBody = `
+Nova sol·licitud de negoci per GustCat:
+
+Nom del negoci: ${formData.nom}
+Descripció: ${formData.descripcio}
+Categoria: ${formData.categoria}
+Adreça: ${formData.adresa}
+Telèfon: ${formData.telefon}
+Email: ${formData.email}
+Web: ${formData.web}
+Horaris: ${formData.horaris}
+Productes locals: ${formData.productes}
+    `;
+
+    // EMAIL - CANVIA AQUEST EMAIL PEL TEU EMAIL REAL
+    const mailtoLink = `mailto:info@gustcat.com?subject=Nova sol·licitud de negoci&body=${encodeURIComponent(emailBody)}`;
+    window.location.href = mailtoLink;
+
+    // Resetear formulari
+    setFormData({
+      nom: '',
+      descripcio: '',
+      categoria: '',
+      adresa: '',
+      telefon: '',
+      email: '',
+      web: '',
+      horaris: '',
+      productes: ''
+    });
+
+    alert('Sol·licitud enviada! Gràcies per contactar amb nosaltres.');
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // PÀGINA D'INICI - Presentació de GustCat
+  const renderInici = () => (
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
+      {/* HERO SECTION */}
+      <div style={{
+        background: 'linear-gradient(rgba(139, 69, 19, 0.7), rgba(210, 105, 30, 0.7)), url("data:image/svg+xml,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 1200 600\\"><rect fill=\\"%23FFF8F3\\" width=\\"1200\\" height=\\"600\\"/><path fill=\\"%23F5E6D3\\" d=\\"M0 300L50 325L100 300L150 275L200 300L250 325L300 300L350 275L400 300L450 325L500 300L550 275L600 300L650 325L700 300L750 275L800 300L850 325L900 300L950 275L1000 300L1050 325L1100 300L1150 275L1200 300V600H0V300Z\\"/></svg>")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        padding: '4rem 2rem',
+        textAlign: 'center',
+        color: 'white',
+        borderRadius: '15px',
+        marginBottom: '3rem'
+      }}>
+        {/* LOGO PRINCIPAL - SUBSTITUEIX AQUEST DIV PEL TEU LOGO */}
+        <div style={{
+          width: '80px',
+          height: '80px',
+          margin: '0 auto 2rem',
+          background: 'rgba(255, 255, 255, 0.2)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '2rem',
+          border: '3px solid rgba(255, 255, 255, 0.3)'
+        }}>
+          🍽️
         </div>
-    </header>
+        {/* Per afegir el teu logo, substitueix el div anterior per:
+            <img src="ruta-al-teu-logo.png" alt="GustCat Logo" style={{width: '80px', height: '80px', margin: '0 auto 2rem', borderRadius: '50%'}} />
+        */}
+        
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+          Descobreix els Sabors Autèntics de Catalunya
+        </h1>
+        <p style={{ fontSize: '1.3rem', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
+          Troba els millors productes artesans i especialitats locals dels comerços tradicionals catalans
+        </p>
+        <button 
+          onClick={() => setActiveTab('mapa')}
+          style={{
+            backgroundColor: '#FF6B35',
+            color: 'white',
+            padding: '1rem 2rem',
+            borderRadius: '25px',
+            border: 'none',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            fontWeight: 'bold'
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#FF8C42'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#FF6B35'}
+        >
+          Explora el Mapa
+        </button>
+      </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>Descobreix els Sabors Autèntics de Catalunya</h1>
-        <p>Troba els millors productes artesans i especialitats locals dels comerços tradicionals catalans</p>
-    </section>
+      {/* SECCIONS INFORMATIVES */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+        {/* QUÈ ÉS GUSTCAT */}
+        <div style={{
+          background: 'white',
+          padding: '2rem',
+          borderRadius: '15px',
+          boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)'
+        }}>
+          <h3 style={{ color: '#8B4513', marginBottom: '1rem', fontSize: '1.5rem' }}>Què és GustCat?</h3>
+          <p style={{ color: '#6B4423', marginBottom: '1rem', lineHeight: '1.6' }}>
+            GustCat és la plataforma web que connecta els productes locals catalans amb els consumidors conscients. 
+            Descobreix petits productors, botigues tradicionals i mercats locals que valoren la qualitat i la sostenibilitat.
+          </p>
+          <ul style={{ color: '#6B4423', listStyle: 'none', padding: 0 }}>
+            <li style={{ marginBottom: '0.5rem' }}>🌟 Descobreix productes locals autèntics</li>
+            <li style={{ marginBottom: '0.5rem' }}>🏪 Suporta l'economia local</li>
+            <li style={{ marginBottom: '0.5rem' }}>🌱 Redueix la petjada de carboni</li>
+            <li style={{ marginBottom: '0.5rem' }}>🥘 Gaudeix de productes frescos i de qualitat</li>
+          </ul>
+        </div>
 
-    <!-- Search Section -->
-    <section class="search-section">
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="Cerca per nom, producte o municipi..." id="searchInput">
-            <select id="vegueriaSelect">
-                <option value="">Totes les Vegueries</option>
-                <option value="barcelona">Barcelona</option>
-                <option value="girona">Girona</option>
-                <option value="tarragona">Tarragona</option>
-                <option value="lleida">Lleida</option>
-                <option value="catalunya-central">Catalunya Central</option>
-                <option value="alt-pirineu">Alt Pirineu i Aran</option>
-                <option value="terres-ebre">Terres de l'Ebre</option>
-                <option value="penedes">Penedès</option>
+        {/* COM FUNCIONA */}
+        <div style={{
+          background: 'white',
+          padding: '2rem',
+          borderRadius: '15px',
+          boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)'
+        }}>
+          <h3 style={{ color: '#8B4513', marginBottom: '1rem', fontSize: '1.5rem' }}>Com funciona?</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+              <div style={{
+                background: '#FF6B35',
+                color: 'white',
+                borderRadius: '50%',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                flexShrink: 0
+              }}>1</div>
+              <p style={{ color: '#6B4423', margin: 0 }}>Explora el nostre mapa interactiu per descobrir negocis locals</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+              <div style={{
+                background: '#FF6B35',
+                color: 'white',
+                borderRadius: '50%',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                flexShrink: 0
+              }}>2</div>
+              <p style={{ color: '#6B4423', margin: 0 }}>Troba productes locals i de temporada a prop teu</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+              <div style={{
+                background: '#FF6B35',
+                color: 'white',
+                borderRadius: '50%',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                flexShrink: 0
+              }}>3</div>
+              <p style={{ color: '#6B4423', margin: 0 }}>Visita els establiments i gaudeix de productes autèntics</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CRIDA A L'ACCIÓ */}
+      <div style={{
+        textAlign: 'center',
+        background: '#F5E6D3',
+        padding: '3rem 2rem',
+        borderRadius: '15px'
+      }}>
+        <h3 style={{ color: '#8B4513', marginBottom: '1rem', fontSize: '2rem' }}>Uneix-te a la comunitat GustCat</h3>
+        <p style={{ color: '#6B4423', marginBottom: '2rem', fontSize: '1.1rem' }}>
+          Ets un productor local o tens un negoci que ven productes catalans? 
+          Forma part de la nostra xarxa i arriba a més clients conscients.
+        </p>
+        <button 
+          onClick={() => setActiveTab('afegeix')}
+          style={{
+            backgroundColor: '#8B4513',
+            color: 'white',
+            padding: '1rem 2rem',
+            borderRadius: '25px',
+            border: 'none',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Afegeix el teu comerç
+        </button>
+      </div>
+    </div>
+  );
+
+  // PÀGINA DEL MAPA - Mostra negocis del Google Spreadsheet
+  const renderMapa = () => (
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
+      <h2 style={{ color: '#8B4513', marginBottom: '2rem', fontSize: '2.5rem', textAlign: 'center' }}>
+        Mapa de Productes Locals
+      </h2>
+      
+      {/* ESTAT DE CÀRREGA */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid #F5E6D3',
+            borderTop: '4px solid #8B4513',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }}></div>
+          <p style={{ color: '#6B4423' }}>Carregant negocis locals des del Google Spreadsheet...</p>
+        </div>
+      ) : (
+        <div>
+          {/* ÀREA DEL MAPA INTERACTIU */}
+          <div style={{
+            background: '#F5E6D3',
+            height: '400px',
+            borderRadius: '15px',
+            marginBottom: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗺️</div>
+              <p style={{ color: '#8B4513', fontSize: '1.2rem', fontWeight: 'bold' }}>Mapa interactiu</p>
+              <p style={{ color: '#6B4423', fontSize: '0.9rem' }}>(Integració amb Leaflet/Google Maps pendent)</p>
+            </div>
+          </div>
+          
+          {/* COMPTADOR DE NEGOCIS */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ color: '#8B4513', fontSize: '1.5rem' }}>
+              Negocis locals ({businesses.length})
+            </h3>
+          </div>
+          
+          {/* LLISTA DE NEGOCIS DEL SPREADSHEET */}
+          {businesses.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '3rem',
+              background: '#F5E6D3',
+              borderRadius: '15px'
+            }}>
+              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🏪</div>
+              <h3 style={{ color: '#8B4513', marginBottom: '1rem' }}>No s'han trobat negocis</h3>
+              <p style={{ color: '#6B4423', marginBottom: '2rem' }}>Comprova la connexió amb el Google Spreadsheet</p>
+              <button 
+                onClick={() => setActiveTab('afegeix')}
+                style={{
+                  backgroundColor: '#FF6B35',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '25px',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Afegeix el primer negoci
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+              gap: '2rem'
+            }}>
+              {businesses.map((business, index) => (
+                <div key={index} style={{
+                  background: 'white',
+                  borderRadius: '15px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  cursor: 'pointer'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 5px 20px rgba(139, 69, 19, 0.2)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(139, 69, 19, 0.1)';
+                }}>
+                  {/* CAPÇALERA DEL NEGOCI */}
+                  <div style={{
+                    background: 'linear-gradient(135deg, #8B4513, #D2691E)',
+                    color: 'white',
+                    padding: '1.5rem'
+                  }}>
+                    <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', margin: 0 }}>
+                      {business.nom || business.Nom || 'Sense nom'}
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', opacity: 0.9 }}>
+                      <span>📍</span>
+                      <span>{business.adresa || business.Adreça || business.adreça || 'Adreça no disponible'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* COS DEL NEGOCI */}
+                  <div style={{ padding: '1.5rem' }}>
+                    <p style={{ color: '#6B4423', marginBottom: '1rem', lineHeight: '1.5' }}>
+                      {business.descripcio || business.Descripció || business.descripció || 'Descripció no disponible'}
+                    </p>
+                    
+                    {/* INFORMACIÓ DETALLADA */}
+                    <div style={{ fontSize: '0.9rem', color: '#6B4423' }}>
+                      {(business.categoria || business.Categoria) && (
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>Categoria:</strong> {business.categoria || business.Categoria}
+                        </p>
+                      )}
+                      {(business.telefon || business.Telèfon || business.telefón) && (
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>Telèfon:</strong> {business.telefon || business.Telèfon || business.telefón}
+                        </p>
+                      )}
+                      {(business.email || business.Email) && (
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>Email:</strong> {business.email || business.Email}
+                        </p>
+                      )}
+                      {(business.web || business.Web || business.website) && (
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>Web:</strong> 
+                          <a href={business.web || business.Web || business.website} 
+                             target="_blank" 
+                             rel="noopener noreferrer" 
+                             style={{ color: '#FF6B35', textDecoration: 'none', marginLeft: '0.5rem' }}>
+                            Visitar
+                          </a>
+                        </p>
+                      )}
+                      {(business.horaris || business.Horaris) && (
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>Horaris:</strong> {business.horaris || business.Horaris}
+                        </p>
+                      )}
+                      {(business.productes || business.Productes) && (
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>Productes:</strong> {business.productes || business.Productes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* PEU DEL NEGOCI */}
+                  <div style={{
+                    padding: '1rem 1.5rem',
+                    background: '#FFF8F3',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '0.3rem 0.8rem',
+                      background: '#8B4513',
+                      color: 'white',
+                      borderRadius: '15px',
+                      fontSize: '0.85rem'
+                    }}>
+                      {business.categoria || business.Categoria || 'General'}
+                    </span>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#6B4423',
+                        cursor: 'pointer',
+                        fontSize: '1.2rem'
+                      }}>❤️</button>
+                      <button style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#6B4423',
+                        cursor: 'pointer',
+                        fontSize: '1.2rem'
+                      }}>📤</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  // FORMULARI PER AFEGIR NEGOCIS
+  const renderAfegeix = () => (
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 2rem' }}>
+      <h2 style={{ color: '#8B4513', marginBottom: '2rem', fontSize: '2.5rem', textAlign: 'center' }}>
+        Afegeix el teu Comerç
+      </h2>
+      <div style={{
+        background: 'white',
+        padding: '3rem',
+        borderRadius: '15px',
+        boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)'
+      }}>
+        <p style={{ color: '#6B4423', marginBottom: '2rem', textAlign: 'center', fontSize: '1.1rem' }}>
+          Omple aquest formulari i ens posarem en contacte amb tu per afegir el teu negoci a la nostra pàgina web
+        </p>
+        
+        {/* FORMULARI DE CONTACTE */}
+        <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* NOM DEL NEGOCI */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Nom del negoci *
+            </label>
+            <input
+              type="text"
+              name="nom"
+              value={formData.nom}
+              onChange={handleInputChange}
+              required
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box'
+              }}
+              placeholder="El nom del teu comerç"
+            />
+          </div>
+
+          {/* DESCRIPCIÓ */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Descripció *
+            </label>
+            <textarea
+              name="descripcio"
+              value={formData.descripcio}
+              onChange={handleInputChange}
+              required
+              rows="4"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box',
+                resize: 'vertical'
+              }}
+              placeholder="Descriu el teu negoci i els productes que ofereixes"
+            />
+          </div>
+
+          {/* CATEGORIA */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Categoria *
+            </label>
+            <select
+              name="categoria"
+              value={formData.categoria}
+              onChange={handleInputChange}
+              required
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box',
+                background: 'white'
+              }}
+            >
+              <option value="">Selecciona una categoria</option>
+              <option value="Carn">Carn (xai, vedella, porc, aviram)</option>
+              <option value="Elaboradors alimentaris">Elaboradors alimentaris</option>
+              <option value="Embotits">Embotits propis</option>
+              <option value="Begudes">Begudes artesanes</option>
+              <option value="Formatges">Formatges i làctics</option>
+              <option value="Oli">Oli i olives</option>
+              <option value="Pa">Pa, pastissos</option>
+              <option value="Peix">Peix, marisc</option>
+              <option value="Llegums">Llegums</option>
+              <option value="Pastes">Pastes, arròs, cereals</option>
+              <option value="Fruita seca">Fruita seca</option>
+              <option value="Fruita i verdures">Fruita i verdures fresques</option>
+              <option value="Mel">Mel i condiments aromàtics</option>
+              <option value="Restauració">Restauració</option>
             </select>
-            <select id="comarcaSelect">
-                <option value="">Totes les Comarques</option>
-            </select>
-            <select id="municipiSelect">
-                <option value="">Tots els Municipis</option>
-            </select>
-            <button class="btn-primary" onclick="searchCommerces()">
-                <i class="fas fa-search"></i> Cercar
+          </div>
+
+          {/* ADREÇA */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Adreça *
+            </label>
+            <input
+              type="text"
+              name="adresa"
+              value={formData.adresa}
+              onChange={handleInputChange}
+              required
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Carrer, número, ciutat, codi postal"
+            />
+          </div>
+
+          {/* TELÈFON I EMAIL */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+                Telèfon
+              </label>
+              <input
+                type="tel"
+                name="telefon"
+                value={formData.telefon}
+                onChange={handleInputChange}
+                style={{
+                  width: '100%',
+                  padding: '1rem',
+                  border: '2px solid #E8D5C4',
+                  borderRadius: '10px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+                placeholder="123 456 789"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                style={{
+                  width: '100%',
+                  padding: '1rem',
+                  border: '2px solid #E8D5C4',
+                  borderRadius: '10px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+                placeholder="info@elneuteu.cat"
+              />
+            </div>
+          </div>
+
+          {/* PÀGINA WEB */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Pàgina web
+            </label>
+            <input
+              type="url"
+              name="web"
+              value={formData.web}
+              onChange={handleInputChange}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box'
+              }}
+              placeholder="https://www.elneuteu.cat"
+            />
+          </div>
+
+          {/* HORARIS */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Horaris
+            </label>
+            <textarea
+              name="horaris"
+              value={formData.horaris}
+              onChange={handleInputChange}
+              rows="3"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box',
+                resize: 'vertical'
+              }}
+              placeholder="Dilluns a divendres: 9:00-14:00 i 16:00-20:00"
+            />
+          </div>
+
+          {/* PRODUCTES LOCALS */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#8B4513' }}>
+              Productes locals que ofereixes
+            </label>
+            <textarea
+              name="productes"
+              value={formData.productes}
+              onChange={handleInputChange}
+              rows="4"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #E8D5C4',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                boxSizing: 'border-box',
+                resize: 'vertical'
+              }}
+              placeholder="Descriu els productes locals que vens: formatges artesans, vins de la DO, mel local..."
+            />
+          </div>
+
+          {/* BOTÓ D'ENVIAMENT */}
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              backgroundColor: '#FF6B35',
+              color: 'white',
+              padding: '1rem 2rem',
+              borderRadius: '25px',
+              border: 'none',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              marginTop: '1rem'
+            }}
+          >
+            Enviar Sol·licitud
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+
+  // PÀGINA DE CONTACTE
+  const renderContacte = () => (
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 2rem' }}>
+      <h2 style={{ color: '#8B4513', marginBottom: '2rem', fontSize: '2.5rem', textAlign: 'center' }}>
+        Contacte
+      </h2>
+      
+      <div style={{
+        background: 'white',
+        padding: '3rem',
+        borderRadius: '15px',
+        boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          {/* LOGO PETIT - SUBSTITUEIX PEL TEU LOGO */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 1rem',
+            background: '#F5E6D3',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '4px solid #8B4513',
+            fontSize: '2rem'
+          }}>
+            🍽️
+          </div>
+          {/* Per afegir el teu logo, substitueix el div anterior per:
+              <img src="ruta-al-teu-logo.png" alt="GustCat Logo" style={{width: '80px', height: '80px', margin: '0 auto 1rem', borderRadius: '50%'}} />
+          */}
+          
+          <h3 style={{ color: '#8B4513', marginBottom: '1rem', fontSize: '1.8rem' }}>Equip GustCat</h3>
+          <p style={{ color: '#6B4423', fontSize: '1.1rem' }}>
+            Estem aquí per ajudar-te amb qualsevol dubte sobre la nostra pàgina web
+          </p>
+        </div>
+
+        {/* INFORMACIÓ DE CONTACTE */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* EMAIL - CANVIA PEL TEU EMAIL REAL */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{
+              background: '#F5E6D3',
+              padding: '1rem',
+              borderRadius: '50%',
+              fontSize: '1.5rem'
+            }}>
+              📧
+            </div>
+            <div>
+              <h4 style={{ color: '#8B4513', margin: '0 0 0.5rem 0', fontSize: '1.2rem' }}>Email</h4>
+              <p style={{ color: '#6B4423', margin: 0, fontSize: '1.1rem' }}>info@gustcat.com</p>
+            </div>
+          </div>
+
+          {/* TELÈFON - CANVIA PEL TEU TELÈFON REAL */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{
+              background: '#F5E6D3',
+              padding: '1rem',
+              borderRadius: '50%',
+              fontSize: '1.5rem'
+            }}>
+              📞
+            </div>
+            <div>
+              <h4 style={{ color: '#8B4513', margin: '0 0 0.5rem 0', fontSize: '1.2rem' }}>Telèfon</h4>
+              <p style={{ color: '#6B4423', margin: 0, fontSize: '1.1rem' }}>+34 123 456 789</p>
+            </div>
+          </div>
+
+          {/* UBICACIÓ */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{
+              background: '#F5E6D3',
+              padding: '1rem',
+              borderRadius: '50%',
+              fontSize: '1.5rem'
+            }}>
+              📍
+            </div>
+            <div>
+              <h4 style={{ color: '#8B4513', margin: '0 0 0.5rem 0', fontSize: '1.2rem' }}>Ubicació</h4>
+              <p style={{ color: '#6B4423', margin: 0, fontSize: '1.1rem' }}>Barcelona, Catalunya</p>
+            </div>
+          </div>
+        </div>
+
+        {/* XARXES SOCIALS */}
+        <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid #E8D5C4' }}>
+          <h4 style={{ color: '#8B4513', marginBottom: '1rem', fontSize: '1.2rem' }}>Segueix-nos</h4>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <a href="#" style={{
+              background: '#F5E6D3',
+              padding: '0.8rem',
+              borderRadius: '50%',
+              textDecoration: 'none',
+              fontSize: '1.2rem',
+              transition: 'background 0.3s'
+            }}>📘</a>
+            <a href="#" style={{
+              background: '#F5E6D3',
+              padding: '0.8rem',
+              borderRadius: '50%',
+              textDecoration: 'none',
+              fontSize: '1.2rem',
+              transition: 'background 0.3s'
+            }}>📷</a>
+            <a href="#" style={{
+              background: '#F5E6D3',
+              padding: '0.8rem',
+              borderRadius: '50%',
+              textDecoration: 'none',
+              fontSize: '1.2rem',
+              transition: 'background 0.3s'
+            }}>🐦</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: '#FFF8F3', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
+      {/* HEADER - NAVEGACIÓ PRINCIPAL */}
+      <header style={{
+        background: 'linear-gradient(135deg, #8B4513, #D2691E)',
+        color: 'white',
+        padding: '1rem 0',
+        boxShadow: '0 2px 10px rgba(139, 69, 19, 0.1)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000
+      }}>
+        <div style={{
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: '0 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          {/* LOGO I NOM DE LA MARCA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {/* LOGO PETIT DEL HEADER - SUBSTITUEIX PEL TEU LOGO */}
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem'
+            }}>
+              🍽️
+            </div>
+            <span style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>GustCat</span>
+          </div>
+          
+          {/* MENÚ DE NAVEGACIÓ */}
+          <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <button
+              onClick={() => setActiveTab('inici')}
+              style={{
+                background: activeTab === 'inici' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '500',
+                transition: 'all 0.3s'
+              }}
+            >
+              Inici
             </button>
-        </div>
-    </section>
-
-    <!-- Map and Filters -->
-    <section class="map-container">
-        <aside class="filters-sidebar">
-            <div class="filter-section">
-                <h3><i class="fas fa-filter"></i> Categories</h3>
-                <div class="category-filters">
-                    <div class="category-filter">
-                        <input type="checkbox" id="carn" checked>
-                        <label for="carn">
-                            <span class="category-icon">🥩</span>
-                            Carn (xai, vedella, porc, aviram)
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="elaboradors" checked>
-                        <label for="elaboradors">
-                            <span class="category-icon">🥘</span>
-                            Elaboradors alimentaris
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="embotits" checked>
-                        <label for="embotits">
-                            <span class="category-icon">🌭</span>
-                            Embotits propis
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="begudes" checked>
-                        <label for="begudes">
-                            <span class="category-icon">🍷</span>
-                            Begudes artesanes
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="formatges" checked>
-                        <label for="formatges">
-                            <span class="category-icon">🧀</span>
-                            Formatges i làctics
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="oli" checked>
-                        <label for="oli">
-                            <span class="category-icon">🫒</span>
-                            Oli i olives
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="pa" checked>
-                        <label for="pa">
-                            <span class="category-icon">🥐</span>
-                            Pa, pastissos
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="peix" checked>
-                        <label for="peix">
-                            <span class="category-icon">🐟</span>
-                            Peix, marisc
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="llegums" checked>
-                        <label for="llegums">
-                            <span class="category-icon">🫘</span>
-                            Llegums
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="pastes" checked>
-                        <label for="pastes">
-                            <span class="category-icon">🍝</span>
-                            Pastes, arròs, cereals
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="fruitaseca" checked>
-                        <label for="fruitaseca">
-                            <span class="category-icon">🥜</span>
-                            Fruita seca
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="fruitaverdures" checked>
-                        <label for="fruitaverdures">
-                            <span class="category-icon">🍎</span>
-                            Fruita i verdures fresques
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="mel" checked>
-                        <label for="mel">
-                            <span class="category-icon">🍯</span>
-                            Mel i condiments aromàtics
-                        </label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="restauracio" checked>
-                        <label for="restauracio">
-                            <span class="category-icon">🍽️</span>
-                            Restauració
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="filter-section">
-                <h3><i class="fas fa-euro-sign"></i> Rang de Preus</h3>
-                <select class="search-input" style="width: 100%;">
-                    <option value="">Tots els preus</option>
-                    <option value="economic">Econòmic (€)</option>
-                    <option value="moderat">Moderat (€€)</option>
-                    <option value="premium">Premium (€€€)</option>
-                </select>
-            </div>
-
-            <div class="filter-section">
-                <h3><i class="fas fa-star"></i> Característiques</h3>
-                <div class="category-filters">
-                    <div class="category-filter">
-                        <input type="checkbox" id="ecologic">
-                        <label for="ecologic">Productes Ecològics</label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="km0">
-                        <label for="km0">Km 0</label>
-                    </div>
-                    <div class="category-filter">
-                        <input type="checkbox" id="denominacio">
-                        <label for="denominacio">D.O. Protegida</label>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn-primary" style="width: 100%; margin-top: 1rem;">
-                Aplicar Filtres
+            <button
+              onClick={() => setActiveTab('mapa')}
+              style={{
+                background: activeTab === 'mapa' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '500',
+                transition: 'all 0.3s'
+              }}
+            >
+              Mapa de productes
             </button>
-        </aside>
-
-        <div id="map"></div>
-    </section>
-
-    <!-- Results Section -->
-    <section class="results-section" id="comercos">
-        <div class="results-header">
-            <h2>Comerços Destacats</h2>
-            <span class="results-count">Mostrant 6 de 127 comerços</span>
+            <button
+              onClick={() => setActiveTab('afegeix')}
+              style={{
+                background: activeTab === 'afegeix' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '500',
+                transition: 'all 0.3s'
+              }}
+            >
+              Afegeix el teu comerç
+            </button>
+            <button
+              onClick={() => setActiveTab('contacte')}
+              style={{
+                background: activeTab === 'contacte' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '500',
+                transition: 'all 0.3s'
+              }}
+            >
+              Contacte
+            </button>
+          </nav>
         </div>
+      </header>
 
-        <div class="commerce-grid">
-            <!-- Commerce Card 1 -->
-            <article class="commerce-card" onclick="showCommerceDetail(1)">
-                <div class="commerce-header">
-                    <h3>Cal Pepet - Embotits Artesans</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Vic, Osona</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Des de 1920, elaborem embotits seguint les receptes tradicionals de la comarca d'Osona. 
-                        Especialistes en llonganissa de Vic.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Llonganissa de Vic IGP</strong></p>
-                        <p>Elaborada amb les millors carns i el clima únic d'Osona</p>
-                        <span class="product-price">12€/kg</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Productes Càrnics</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
+      {/* CONTINGUT PRINCIPAL */}
+      <main style={{ padding: '3rem 0' }}>
+        {activeTab === 'inici' && renderInici()}
+        {activeTab === 'mapa' && renderMapa()}
+        {activeTab === 'afegeix' && renderAfegeix()}
+        {activeTab === 'contacte' && renderContacte()}
+      </main>
 
-            <!-- Commerce Card 2 -->
-            <article class="commerce-card" onclick="showCommerceDetail(2)">
-                <div class="commerce-header">
-                    <h3>Formatgeria Mas Farró</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Moià, Moianès</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Formatgeria familiar amb més de 50 anys d'experiència. Elaborem formatges artesans 
-                        amb llet de les nostres pròpies cabres.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Formatge de Cabra Curat</strong></p>
-                        <p>Maduració mínima de 6 mesos en coves naturals</p>
-                        <span class="product-price">28€/kg</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Productes Làctics</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 3 -->
-            <article class="commerce-card" onclick="showCommerceDetail(3)">
-                <div class="commerce-header">
-                    <h3>Pastisseria Sant Croi</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Olot, Garrotxa</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Pastisseria centenària especialitzada en dolços tradicionals de la Garrotxa. 
-                        Guardonats múltiples vegades pels nostres tortells.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Coca de Llardons</strong></p>
-                        <p>Recepta tradicional del segle XIX</p>
-                        <span class="product-price">18€/unitat</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Pastisseria</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 4 -->
-            <article class="commerce-card" onclick="showCommerceDetail(4)">
-                <div class="commerce-header">
-                    <h3>Celler Mas Doix</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Poboleda, Priorat</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Celler familiar al cor del Priorat. Vins de costers centenaris elaborats 
-                        amb mètodes tradicionals i agricultura ecològica.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Salanques 2019</strong></p>
-                        <p>Vi negre DOQ Priorat, 95 punts Parker</p>
-                        <span class="product-price">45€/ampolla</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Vins i Caves</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 5 -->
-            <article class="commerce-card" onclick="showCommerceDetail(5)">
-                <div class="commerce-header">
-                    <h3>Conserves Ferrer</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>L'Escala, Alt Empordà</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Anxoves de l'Escala des de 1940. Elaboració artesanal seguint el mètode 
-                        tradicional de salaó i maduració.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Anxoves de l'Escala Premium</strong></p>
-                        <p>12 mesos de maduració, fileteades a mà</p>
-                        <span class="product-price">32€/kg</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Conserves</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 6 -->
-            <article class="commerce-card" onclick="showCommerceDetail(6)">
-                <div class="commerce-header">
-                    <h3>Restaurant Ca l'Enric</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>La Vall de Bianya, Garrotxa</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Cuina volcànica d'autor amb productes de proximitat. Una estrella Michelin 
-                        i compromís amb la sostenibilitat.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Plat Estrella</h4>
-                        <p><strong>Fesols de Santa Pau amb botifarra</strong></p>
-                        <p>Reinterpretació moderna d'un clàssic</p>
-                        <span class="product-price">Menú degustació 95€</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Restaurants</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
+      {/* FOOTER */}
+      <footer style={{
+        background: '#2C1810',
+        color: 'white',
+        padding: '3rem 2rem 1rem',
+        marginTop: '4rem'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
+          {/* LOGO I NOM DEL FOOTER */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+            <div style={{
+              width: '30px',
+              height: '30px',
+              background: 'white',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '0.5rem',
+              fontSize: '1rem'
+            }}>
+              🍽️
+            </div>
+            <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>GustCat</span>
+          </div>
+          
+          {/* ESLÒGAN */}
+          <p style={{ color: '#D2691E', marginBottom: '1rem', fontSize: '1.1rem' }}>
+            Connectant Catalunya amb els seus productes locals
+          </p>
+          
+          {/* COPYRIGHT */}
+          <p style={{ color: '#999', fontSize: '0.9rem' }}>
+            © 2024 GustCat. Tots els drets reservats.
+          </p>
         </div>
-    </section>
+      </footer>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>GustCat</h3>
-                <p>La plataforma per descobrir els millors productes artesans i comerços locals de Catalunya.</p>
-                <div style="margin-top: 1rem;">
-                    <a href="#" style="margin-right: 1rem;"><i class="fab fa-facebook"></i></a>
-                    <a href="#" style="margin-right: 1rem;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="margin-right: 1rem;"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h3>Per a Comerços</h3>
-                <ul>
-                    <li><a href="#">Afegeix el teu comerç</a></li>
-                    <li><a href="#">Plans i preus</a></li>
-                    <li><a href="#">Avantatges</a></li>
-                    <li><a href="#">Testimonis</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Descobreix</h3>
-                <ul>
-                    <li><a href="#">Mapa de comerços</a></li>
-                    <li><a href="#">Categories</a></li>
-                    <li><a href="#">Productes destacats</a></li>
-                    <li><a href="#">Rutes gastronòmiques</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contacte</h3>
-                <ul>
-                    <li><i class="fas fa-envelope"></i> info@gustcat.cat</li>
-                    <li><i class="fas fa-phone"></i> 93 123 45 67</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Barcelona, Catalunya</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 GustCat. Tots els drets reservats. | <a href="#">Política de Privacitat</a> | <a href="#">Termes d'Ús</a></p>
-        </div>
-    </footer>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <script>
-        // Initialize map
-        const map = L.map('map').setView([41.8204, 1.8676], 8);
-
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Sample commerce data
-        const commerces = [
-            {
-                id: 1,
-                name: "Cal Pepet - Embotits Artesans",
-                lat: 41.9294,
-                lng: 2.2545,
-                category: "Productes Càrnics",
-                icon: "🥩",
-                municipi: "Vic",
-                comarca: "Osona",
-                producte: "Llonganissa de Vic IGP",
-                preu: "12€/kg"
-            },
-            {
-                id: 2,
-                name: "Formatgeria Mas Farró",
-                lat: 41.8103,
-                lng: 2.0975,
-                category: "Productes Làctics",
-                icon: "🧀",
-                municipi: "Moià",
-                comarca: "Moianès",
-                producte: "Formatge de Cabra Curat",
-                preu: "28€/kg"
-            },
-            {
-                id: 3,
-                name: "Pastisseria Sant Croi",
-                lat: 42.1820,
-                lng: 2.4901,
-                category: "Pastisseria",
-                icon: "🥐",
-                municipi: "Olot",
-                comarca: "Garrotxa",
-                producte: "Coca de Llardons",
-                preu: "18€/unitat"
-            },
-            {
-                id: 4,
-                name: "Celler Mas Doix",
-                lat: 41.1472,
-                lng: 0.8303,
-                category: "Vins i Caves",
-                icon: "🍷",
-                municipi: "Poboleda",
-                comarca: "Priorat",
-                producte: "Salanques 2019",
-                preu: "45€/ampolla"
-            },
-            {
-                id: 5,
-                name: "Conserves Ferrer",
-                lat: 42.1075,
-                lng: 3.1306,
-                category: "Conserves",
-                icon: "🥫",
-                municipi: "L'Escala",
-                comarca: "Alt Empordà",
-                producte: "Anxoves Premium",
-                preu: "32€/kg"
-            },
-            {
-                id: 6,
-                name: "Restaurant Ca l'Enric",
-                lat: 42.2167,
-                lng: 2.4333,
-                category: "Restaurants",
-                icon: "🍽️",
-                municipi: "La Vall de Bianya",
-                comarca: "Garrotxa",
-                producte: "Menú degustació",
-                preu: "95€"
-            }
-        ];
-
-        // Custom icon function
-        function createCustomIcon(icon) {
-            return L.divIcon({
-                html: `<div style="background: white; border: 3px solid #8B4513; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${icon}</div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 40],
-                popupAnchor: [0, -40],
-                className: 'custom-marker'
-            });
+      {/* CSS ANIMATIONS */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
-
-        // Add markers to map
-        commerces.forEach(commerce => {
-            const marker = L.marker([commerce.lat, commerce.lng], {
-                icon: createCustomIcon(commerce.icon)
-            }).addTo(map);
-
-            // Create popup content
-            const popupContent = `
-                <div class="popup-content">
-                    <div class="popup-header">
-                        <h4>${commerce.name}</h4>
-                        <span class="popup-category">${commerce.category}</span>
-                    </div>
-                    <div class="popup-product">
-                        <strong>${commerce.producte}</strong>
-                        <span style="color: #FF6B35; font-weight: bold;">${commerce.preu}</span>
-                    </div>
-                    <div style="color: #6B4423; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <i class="fas fa-map-marker-alt"></i> ${commerce.municipi}, ${commerce.comarca}
-                    </div>
-                    <div class="popup-actions">
-                        <button class="popup-btn popup-btn-primary" onclick="showCommerceDetail(${commerce.id})">
-                            Veure detalls
-                        </button>
-                        <button class="popup-btn popup-btn-secondary">
-                            <i class="fas fa-directions"></i> Com arribar
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            marker.bindPopup(popupContent, {
-                maxWidth: 300,
-                className: 'custom-popup'
-            });
-        });
-
-        // Search function
-        function searchCommerces() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const vegueria = document.getElementById('vegueriaSelect').value;
-            const comarca = document.getElementById('comarcaSelect').value;
-            const municipi = document.getElementById('municipiSelect').value;
-            
-            console.log('Searching for:', searchTerm, vegueria, comarca, municipi);
-            // Implement search logic here
-        }
-
-        // Show commerce detail
-        function showCommerceDetail(id) {
-            console.log('Showing details for commerce:', id);
-            // Implement navigation to detail page
-        }
-
-        // Update dependent selects
-        document.getElementById('vegueriaSelect').addEventListener('change', function() {
-            const comarcaSelect = document.getElementById('comarcaSelect');
-            comarcaSelect.innerHTML = '<option value="">Totes les Comarques</option>';
-            
-            // Add logic to populate comarcas based on selected vegueria
-            if (this.value === 'girona') {
-                comarcaSelect.innerHTML += '<option value="alt-emporda">Alt Empordà</option>';
-                comarcaSelect.innerHTML += '<option value="baix-emporda">Baix Empordà</option>';
-                comarcaSelect.innerHTML += '<option value="garrotxa">Garrotxa</option>';
-                comarcaSelect.innerHTML += '<option value="girones">Gironès</option>';
-                comarcaSelect.innerHTML += '<option value="pla-estany">Pla de l\'Estany</option>';
-                comarcaSelect.innerHTML += '<option value="ripolles">Ripollès</option>';
-                comarcaSelect.innerHTML += '<option value="selva">Selva</option>';
-            } else if (this.value === 'barcelona') {
-                comarcaSelect.innerHTML += '<option value="barcelones">Barcelonès</option>';
-                comarcaSelect.innerHTML += '<option value="baix-llobregat">Baix Llobregat</option>';
-                comarcaSelect.innerHTML += '<option value="maresme">Maresme</option>';
-                comarcaSelect.innerHTML += '<option value="valles-occidental">Vallès Occidental</option>';
-                comarcaSelect.innerHTML += '<option value="valles-oriental">Vallès Oriental</option>';
-            }
-            // Add more vegueries...
-        });
-
-        // Filter by category
-        document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                console.log('Filter changed:', this.id, this.checked);
-                // Implement filter logic
-            });
-        });
-
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+      `}</style>
+    </div>
+  );
+}
