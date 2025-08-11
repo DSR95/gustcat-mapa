@@ -604,13 +604,14 @@
             <input type="text" class="search-input" placeholder="Cerca per nom, producte o municipi..." id="searchInput">
             <select id="vegueriaSelect">
                 <option value="">Totes les Vegueries</option>
-                <option value="Alt Pirineu i Aran">Alt Pirineu i Aran</option>
-                <option value="Camp de Tarragona">Camp de Tarragona</option>
-                <option value="Comarques Centrals">Comarques Centrals</option>
-                <option value="Comarques Gironines">Comarques Gironines</option>
-                <option value="Penedès">Penedès</option>
-                <option value="Terres de l'Ebre">Terres de l'Ebre</option>
-                <option value="Àmbit metropolità de Barcelona">Àmbit metropolità de Barcelona</option>
+                <option value="barcelona">Barcelona</option>
+                <option value="girona">Girona</option>
+                <option value="tarragona">Tarragona</option>
+                <option value="lleida">Lleida</option>
+                <option value="catalunya-central">Catalunya Central</option>
+                <option value="alt-pirineu">Alt Pirineu i Aran</option>
+                <option value="terres-ebre">Terres de l'Ebre</option>
+                <option value="penedes">Penedès</option>
             </select>
             <select id="comarcaSelect">
                 <option value="">Totes les Comarques</option>
@@ -718,187 +719,7 @@
             <span class="results-count">Mostrant 6 de 127 comerços</span>
         </div>
 
-        <div class="commerce-grid">
-            <!-- Commerce Card 1 -->
-            <article class="commerce-card" onclick="showCommerceDetail(1)">
-                <div class="commerce-header">
-                    <h3>Cal Pepet - Embotits Artesans</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Vic, Osona</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Des de 1920, elaborem embotits seguint les receptes tradicionals de la comarca d'Osona. 
-                        Especialistes en llonganissa de Vic.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Llonganissa de Vic IGP</strong></p>
-                        <p>Elaborada amb les millors carns i el clima únic d'Osona</p>
-                        <span class="product-price">12€/kg</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Productes Càrnics</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 2 -->
-            <article class="commerce-card" onclick="showCommerceDetail(2)">
-                <div class="commerce-header">
-                    <h3>Formatgeria Mas Farró</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Moià, Moianès</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Formatgeria familiar amb més de 50 anys d'experiència. Elaborem formatges artesans 
-                        amb llet de les nostres pròpies cabres.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Formatge de Cabra Curat</strong></p>
-                        <p>Maduració mínima de 6 mesos en coves naturals</p>
-                        <span class="product-price">28€/kg</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Productes Làctics</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 3 -->
-            <article class="commerce-card" onclick="showCommerceDetail(3)">
-                <div class="commerce-header">
-                    <h3>Pastisseria Sant Croi</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Olot, Garrotxa</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Pastisseria centenària especialitzada en dolços tradicionals de la Garrotxa. 
-                        Guardonats múltiples vegades pels nostres tortells.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Coca de Llardons</strong></p>
-                        <p>Recepta tradicional del segle XIX</p>
-                        <span class="product-price">18€/unitat</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Pastisseria</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 4 -->
-            <article class="commerce-card" onclick="showCommerceDetail(4)">
-                <div class="commerce-header">
-                    <h3>Celler Mas Doix</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Poboleda, Priorat</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Celler familiar al cor del Priorat. Vins de costers centenaris elaborats 
-                        amb mètodes tradicionals i agricultura ecològica.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Salanques 2019</strong></p>
-                        <p>Vi negre DOQ Priorat, 95 punts Parker</p>
-                        <span class="product-price">45€/ampolla</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Vins i Caves</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 5 -->
-            <article class="commerce-card" onclick="showCommerceDetail(5)">
-                <div class="commerce-header">
-                    <h3>Conserves Ferrer</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>L'Escala, Alt Empordà</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Anxoves de l'Escala des de 1940. Elaboració artesanal seguint el mètode 
-                        tradicional de salaó i maduració.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Producte Estrella</h4>
-                        <p><strong>Anxoves de l'Escala Premium</strong></p>
-                        <p>12 mesos de maduració, fileteades a mà</p>
-                        <span class="product-price">32€/kg</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Conserves</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Commerce Card 6 -->
-            <article class="commerce-card" onclick="showCommerceDetail(6)">
-                <div class="commerce-header">
-                    <h3>Restaurant Ca l'Enric</h3>
-                    <div class="commerce-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>La Vall de Bianya, Garrotxa</span>
-                    </div>
-                </div>
-                <div class="commerce-body">
-                    <p class="commerce-description">
-                        Cuina volcànica d'autor amb productes de proximitat. Una estrella Michelin 
-                        i compromís amb la sostenibilitat.
-                    </p>
-                    <div class="product-showcase">
-                        <h4><i class="fas fa-star"></i> Plat Estrella</h4>
-                        <p><strong>Fesols de Santa Pau amb botifarra</strong></p>
-                        <p>Reinterpretació moderna d'un clàssic</p>
-                        <span class="product-price">Menú degustació 95€</span>
-                    </div>
-                </div>
-                <div class="commerce-footer">
-                    <span class="commerce-category">Restaurants</span>
-                    <div class="commerce-actions">
-                        <button class="action-btn"><i class="fas fa-heart"></i></button>
-                        <button class="action-btn"><i class="fas fa-share"></i></button>
-                    </div>
-                </div>
-            </article>
-        </div>
+        <div class="commerce-grid" id="commerceGrid"></div>
     </section>
 
     <!-- Footer -->
@@ -1033,6 +854,110 @@
             }
         ];
 
+        const CATEGORY_MAP = {
+            carnics: 'Productes Càrnics',
+            lactics: 'Productes Làctics',
+            pastisseria: 'Pastisseria',
+            vins: 'Vins i Caves',
+            conserves: 'Conserves',
+            restaurants: 'Restaurants'
+        };
+
+        const COMARCA_TO_VEGUERIA = {
+            'Osona': 'catalunya-central',
+            'Moianès': 'catalunya-central',
+            'Garrotxa': 'girona',
+            'Alt Empordà': 'girona',
+            'Priorat': 'tarragona'
+        };
+
+        const markersById = {};
+
+        function renderCommerces(list) {
+            const grid = document.getElementById('commerceGrid');
+            if (!grid) return;
+            grid.innerHTML = list.map(c => `
+              <article class="commerce-card" onclick="showCommerceDetail(${c.id})">
+                <div class="commerce-header">
+                  <h3>${c.name}</h3>
+                  <div class="commerce-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${c.municipi}, ${c.comarca}</span>
+                  </div>
+                </div>
+                <div class="commerce-body">
+                  <p class="commerce-description">
+                    ${c.description || 'Productes artesans i especialitats locals.'}
+                  </p>
+                  <div class="product-showcase">
+                    <h4><i class="fas fa-star"></i> Producte Estrella</h4>
+                    <p><strong>${c.producte}</strong></p>
+                    <span class="product-price">${c.preu}</span>
+                  </div>
+                </div>
+                <div class="commerce-footer">
+                  <span class="commerce-category">${c.category}</span>
+                  <div class="commerce-actions">
+                    <button class="action-btn" onclick="event.stopPropagation();"><i class="fas fa-heart"></i></button>
+                    <button class="action-btn" onclick="event.stopPropagation();"><i class="fas fa-share"></i></button>
+                  </div>
+                </div>
+              </article>
+            `).join('');
+        }
+
+        function updateResultsCount(filtered, total = commerces.length) {
+            const el = document.getElementById('resultsCount');
+            if (el) {
+                el.textContent = `Mostrant ${filtered.length} de ${total} comerços`;
+            }
+        }
+
+        function updateMapVisibility(visibleIds) {
+            const set = new Set(visibleIds);
+            commerces.forEach(c => {
+                const m = markersById[c.id];
+                if (!m) return;
+                const onMap = map.hasLayer(m);
+                if (set.has(c.id)) {
+                    if (!onMap) m.addTo(map);
+                } else {
+                    if (onMap) map.removeLayer(m);
+                }
+            });
+        }
+
+        function getSelectedCategories() {
+            const ids = Object.keys(CATEGORY_MAP).filter(id => {
+                const cb = document.getElementById(id);
+                return cb ? cb.checked : false;
+            });
+            return ids.map(id => CATEGORY_MAP[id]);
+        }
+
+        function populateGeoSelects() {
+            const comarcaSelect = document.getElementById('comarcaSelect');
+            const municipiSelect = document.getElementById('municipiSelect');
+            const unique = (arr) => [...new Set(arr)].sort((a,b) => a.localeCompare(b,'ca'));
+            const comarques = unique(commerces.map(c => c.comarca));
+            const municipis = unique(commerces.map(c => c.municipi));
+            comarcaSelect.innerHTML = '<option value="">Totes les Comarques</option>' + comarques.map(c => `<option value="${c}">${c}</option>`).join('');
+            municipiSelect.innerHTML = '<option value="">Tots els Municipis</option>' + municipis.map(m => `<option value="${m}">${m}</option>`).join('');
+        }
+
+        // Auto-bind de filtres bàsics
+        ['searchInput','vegueriaSelect','comarcaSelect','municipiSelect'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const evt = (id === 'searchInput') ? 'input' : 'change';
+            el.addEventListener(evt, () => searchCommerces());
+        });
+
+        // Render inicial
+        populateGeoSelects();
+        renderCommerces(commerces);
+        updateResultsCount(commerces);
+
         // Custom icon function
         function createCustomIcon(icon) {
             return L.divIcon({
@@ -1044,160 +969,79 @@
             });
         }
 
-        // Render categories dynamically
-        function renderCategories() {
-            const categoryFilters = document.getElementById('categoryFilters');
-            categoryFilters.innerHTML = '';
-            
-            Array.from(categories).sort().forEach(category => {
-                const icon = categoryIcons[category] || '📦';
-                const categoryId = category.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                
-                const filterDiv = document.createElement('div');
-                filterDiv.className = 'category-filter';
-                filterDiv.innerHTML = `
-                    <input type="checkbox" id="${categoryId}" checked>
-                    <label for="${categoryId}">
-                        <span class="category-icon">${icon}</span>
-                        ${category}
-                    </label>
-                `;
-                
-                categoryFilters.appendChild(filterDiv);
-                
-                // Add event listener
-                const checkbox = filterDiv.querySelector('input');
-                checkbox.addEventListener('change', applyFilters);
-            });
-        }
+        // Add markers to map
+        commerces.forEach(commerce => {
+            const marker = L.marker([commerce.lat, commerce.lng], {
+                icon: createCustomIcon(commerce.icon)
+            }).addTo(map);
+            markersById[commerce.id] = marker;
 
-        // Render markers on map
-        function renderMarkers() {
-            // Clear existing markers
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            
-            filteredCommerces.forEach(commerce => {
-                const icon = categoryIcons[commerce.category] || '📦';
-                const marker = L.marker([commerce.lat, commerce.lng], {
-                    icon: createCustomIcon(icon)
-                }).addTo(map);
-
-                // Create popup content
-                const popupContent = `
-                    <div class="popup-content">
-                        <div class="popup-header">
-                            <h4>${commerce.name}</h4>
-                            <span class="popup-category">${commerce.category}</span>
-                        </div>
-                        <div class="popup-product">
-                            <strong>${commerce.producte1}</strong>
-                            ${commerce.producte2 ? `<br><em>${commerce.producte2}</em>` : ''}
-                            <br><span style="color: #FF6B35; font-weight: bold;">${commerce.preu}</span>
-                        </div>
-                        <div style="color: #6B4423; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                            <i class="fas fa-map-marker-alt"></i> ${commerce.municipi}, ${commerce.comarca}
-                        </div>
-                        <div class="popup-actions">
-                            <button class="popup-btn popup-btn-primary" onclick="showCommerceDetail(${commerce.id})">
-                                Veure detalls
-                            </button>
-                            <button class="popup-btn popup-btn-secondary">
-                                <i class="fas fa-directions"></i> Com arribar
-                            </button>
-                        </div>
+            // Create popup content
+            const popupContent = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h4>${commerce.name}</h4>
+                        <span class="popup-category">${commerce.category}</span>
                     </div>
-                `;
-
-                marker.bindPopup(popupContent, {
-                    maxWidth: 300,
-                    className: 'custom-popup'
-                });
-                
-                markers.push(marker);
-            });
-        }
-
-        // Render commerce cards
-        function renderCommerceCards() {
-            const commerceGrid = document.querySelector('.commerce-grid');
-            commerceGrid.innerHTML = '';
-            
-            filteredCommerces.slice(0, 12).forEach(commerce => { // Show max 12 cards
-                const icon = categoryIcons[commerce.category] || '📦';
-                const cardDiv = document.createElement('article');
-                cardDiv.className = 'commerce-card';
-                cardDiv.onclick = () => showCommerceDetail(commerce.id);
-                
-                cardDiv.innerHTML = `
-                    <div class="commerce-header">
-                        <h3>${commerce.name}</h3>
-                        <div class="commerce-location">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${commerce.municipi}, ${commerce.comarca}</span>
-                        </div>
+                    <div class="popup-product">
+                        <strong>${commerce.producte}</strong>
+                        <span style="color: #FF6B35; font-weight: bold;">${commerce.preu}</span>
                     </div>
-                    <div class="commerce-body">
-                        <p class="commerce-description">
-                            ${commerce.adreca || 'Comerç local especialitzat en productes de qualitat.'}
-                        </p>
-                        <div class="product-showcase">
-                            <h4><i class="fas fa-star"></i> Producte${commerce.producte2 ? 's' : ''} Estrella</h4>
-                            <p><strong>${commerce.producte1}</strong></p>
-                            ${commerce.producte2 ? `<p><em>${commerce.producte2}</em></p>` : ''}
-                            <span class="product-price">${commerce.preu}</span>
-                        </div>
+                    <div style="color: #6B4423; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-map-marker-alt"></i> ${commerce.municipi}, ${commerce.comarca}
                     </div>
-                    <div class="commerce-footer">
-                        <span class="commerce-category">${commerce.category}</span>
-                        <div class="commerce-actions">
-                            <button class="action-btn"><i class="fas fa-heart"></i></button>
-                            <button class="action-btn"><i class="fas fa-share"></i></button>
-                        </div>
+                    <div class="popup-actions">
+                        <button class="popup-btn popup-btn-primary" onclick="showCommerceDetail(${commerce.id})">
+                            Veure detalls
+                        </button>
+                        <button class="popup-btn popup-btn-secondary">
+                            <i class="fas fa-directions"></i> Com arribar
+                        </button>
                     </div>
-                `;
-                
-                commerceGrid.appendChild(cardDiv);
-            });
-        }
+                </div>
+            `;
 
-        // Update results count
-        function updateResultsCount() {
-            const resultsCount = document.querySelector('.results-count');
-            const total = allCommerces.length;
-            const showing = Math.min(filteredCommerces.length, 12);
-            resultsCount.textContent = `Mostrant ${showing} de ${filteredCommerces.length} comerços (${total} total)`;
-        }
-
-        // Apply filters
-        function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCategories = Array.from(document.querySelectorAll('.category-filter input:checked'))
-                .map(cb => cb.nextElementSibling.textContent.trim());
-            
-            filteredCommerces = allCommerces.filter(commerce => {
-                // Category filter
-                if (!selectedCategories.includes(commerce.category)) return false;
-                
-                // Search filter
-                if (searchTerm && !commerce.name.toLowerCase().includes(searchTerm) && 
-                    !commerce.municipi.toLowerCase().includes(searchTerm) &&
-                    !commerce.producte1.toLowerCase().includes(searchTerm) &&
-                    !commerce.producte2.toLowerCase().includes(searchTerm)) {
-                    return false;
-                }
-                
-                return true;
+            marker.bindPopup(popupContent, {
+                maxWidth: 300,
+                className: 'custom-popup'
             });
-            
-            renderMarkers();
-            renderCommerceCards();
-            updateResultsCount();
-        }
+        });
 
         // Search function
         function searchCommerces() {
-            applyFilters();
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const vegueria = document.getElementById('vegueriaSelect').value;
+            const comarcaSel = document.getElementById('comarcaSelect').value;
+            const municipiSel = document.getElementById('municipiSelect').value;
+            const categories = getSelectedCategories();
+
+            const filtered = commerces.filter(c => {
+                const matchesText =
+                    !searchTerm ||
+                    c.name.toLowerCase().includes(searchTerm) ||
+                    c.municipi.toLowerCase().includes(searchTerm) ||
+                    c.comarca.toLowerCase().includes(searchTerm) ||
+                    c.producte.toLowerCase().includes(searchTerm);
+
+                const matchesCategory =
+                    categories.length === 0 || categories.includes(c.category);
+
+                const matchesMunicipi =
+                    !municipiSel || c.municipi === municipiSel;
+
+                const matchesComarca =
+                    !comarcaSel || c.comarca === comarcaSel;
+
+                const cVeg = COMARCA_TO_VEGUERIA[c.comarca] || '';
+                const matchesVegueria =
+                    !vegueria || vegueria === cVeg;
+
+                return matchesText && matchesCategory && matchesMunicipi && matchesComarca && matchesVegueria;
+            });
+
+            renderCommerces(filtered);
+            updateResultsCount(filtered);
+            updateMapVisibility(filtered.map(x => x.id));
         }
 
         // Show commerce detail
@@ -1230,10 +1074,11 @@
             // Add more vegueries...
         });
 
-        // Add search input listener
-        document.getElementById('searchInput').addEventListener('input', function() {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(applyFilters, 300); // Debounce search
+        // Filter by category
+        document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                searchCommerces();
+            });
         });
 
         // Smooth scroll
@@ -1248,11 +1093,6 @@
                     });
                 }
             });
-        });
-
-        // Initialize data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
         });
     </script>
 </body>
