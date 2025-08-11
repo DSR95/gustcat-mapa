@@ -604,13 +604,14 @@
             <input type="text" class="search-input" placeholder="Cerca per nom, producte o municipi..." id="searchInput">
             <select id="vegueriaSelect">
                 <option value="">Totes les Vegueries</option>
-                <option value="Alt Pirineu i Aran">Alt Pirineu i Aran</option>
-                <option value="Camp de Tarragona">Camp de Tarragona</option>
-                <option value="Comarques Centrals">Comarques Centrals</option>
-                <option value="Comarques Gironines">Comarques Gironines</option>
-                <option value="Penedès">Penedès</option>
-                <option value="Terres de l'Ebre">Terres de l'Ebre</option>
-                <option value="Àmbit metropolità de Barcelona">Àmbit metropolità de Barcelona</option>
+                <option value="barcelona">Barcelona</option>
+                <option value="girona">Girona</option>
+                <option value="tarragona">Tarragona</option>
+                <option value="lleida">Lleida</option>
+                <option value="catalunya-central">Catalunya Central</option>
+                <option value="alt-pirineu">Alt Pirineu i Aran</option>
+                <option value="terres-ebre">Terres de l'Ebre</option>
+                <option value="penedes">Penedès</option>
             </select>
             <select id="comarcaSelect">
                 <option value="">Totes les Comarques</option>
@@ -631,45 +632,101 @@
                 <h3><i class="fas fa-filter"></i> Categories</h3>
                 <div class="category-filters">
                     <div class="category-filter">
-                        <input type="checkbox" id="carnics" checked>
-                        <label for="carnics">
+                        <input type="checkbox" id="carn" checked>
+                        <label for="carn">
                             <span class="category-icon">🥩</span>
-                            Productes Càrnics
+                            Carn (xai, vedella, porc, aviram)
                         </label>
                     </div>
                     <div class="category-filter">
-                        <input type="checkbox" id="lactics" checked>
-                        <label for="lactics">
-                            <span class="category-icon">🧀</span>
-                            Productes Làctics
+                        <input type="checkbox" id="elaboradors" checked>
+                        <label for="elaboradors">
+                            <span class="category-icon">🥘</span>
+                            Elaboradors alimentaris
                         </label>
                     </div>
                     <div class="category-filter">
-                        <input type="checkbox" id="pastisseria" checked>
-                        <label for="pastisseria">
-                            <span class="category-icon">🥐</span>
-                            Pastisseria
+                        <input type="checkbox" id="embotits" checked>
+                        <label for="embotits">
+                            <span class="category-icon">🌭</span>
+                            Embotits propis
                         </label>
                     </div>
                     <div class="category-filter">
-                        <input type="checkbox" id="vins" checked>
-                        <label for="vins">
+                        <input type="checkbox" id="begudes" checked>
+                        <label for="begudes">
                             <span class="category-icon">🍷</span>
-                            Vins i Caves
+                            Begudes artesanes
                         </label>
                     </div>
                     <div class="category-filter">
-                        <input type="checkbox" id="conserves" checked>
-                        <label for="conserves">
-                            <span class="category-icon">🥫</span>
-                            Conserves
+                        <input type="checkbox" id="formatges" checked>
+                        <label for="formatges">
+                            <span class="category-icon">🧀</span>
+                            Formatges i làctics
                         </label>
                     </div>
                     <div class="category-filter">
-                        <input type="checkbox" id="restaurants" checked>
-                        <label for="restaurants">
+                        <input type="checkbox" id="oli" checked>
+                        <label for="oli">
+                            <span class="category-icon">🫒</span>
+                            Oli i olives
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="pa" checked>
+                        <label for="pa">
+                            <span class="category-icon">🥐</span>
+                            Pa, pastissos
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="peix" checked>
+                        <label for="peix">
+                            <span class="category-icon">🐟</span>
+                            Peix, marisc
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="llegums" checked>
+                        <label for="llegums">
+                            <span class="category-icon">🫘</span>
+                            Llegums
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="pastes" checked>
+                        <label for="pastes">
+                            <span class="category-icon">🍝</span>
+                            Pastes, arròs, cereals
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="fruitaseca" checked>
+                        <label for="fruitaseca">
+                            <span class="category-icon">🥜</span>
+                            Fruita seca
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="fruitaverdures" checked>
+                        <label for="fruitaverdures">
+                            <span class="category-icon">🍎</span>
+                            Fruita i verdures fresques
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="mel" checked>
+                        <label for="mel">
+                            <span class="category-icon">🍯</span>
+                            Mel i condiments aromàtics
+                        </label>
+                    </div>
+                    <div class="category-filter">
+                        <input type="checkbox" id="restauracio" checked>
+                        <label for="restauracio">
                             <span class="category-icon">🍽️</span>
-                            Restaurants
+                            Restauració
                         </label>
                     </div>
                 </div>
@@ -1044,160 +1101,52 @@
             });
         }
 
-        // Render categories dynamically
-        function renderCategories() {
-            const categoryFilters = document.getElementById('categoryFilters');
-            categoryFilters.innerHTML = '';
-            
-            Array.from(categories).sort().forEach(category => {
-                const icon = categoryIcons[category] || '📦';
-                const categoryId = category.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                
-                const filterDiv = document.createElement('div');
-                filterDiv.className = 'category-filter';
-                filterDiv.innerHTML = `
-                    <input type="checkbox" id="${categoryId}" checked>
-                    <label for="${categoryId}">
-                        <span class="category-icon">${icon}</span>
-                        ${category}
-                    </label>
-                `;
-                
-                categoryFilters.appendChild(filterDiv);
-                
-                // Add event listener
-                const checkbox = filterDiv.querySelector('input');
-                checkbox.addEventListener('change', applyFilters);
-            });
-        }
+        // Add markers to map
+        commerces.forEach(commerce => {
+            const marker = L.marker([commerce.lat, commerce.lng], {
+                icon: createCustomIcon(commerce.icon)
+            }).addTo(map);
 
-        // Render markers on map
-        function renderMarkers() {
-            // Clear existing markers
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            
-            filteredCommerces.forEach(commerce => {
-                const icon = categoryIcons[commerce.category] || '📦';
-                const marker = L.marker([commerce.lat, commerce.lng], {
-                    icon: createCustomIcon(icon)
-                }).addTo(map);
-
-                // Create popup content
-                const popupContent = `
-                    <div class="popup-content">
-                        <div class="popup-header">
-                            <h4>${commerce.name}</h4>
-                            <span class="popup-category">${commerce.category}</span>
-                        </div>
-                        <div class="popup-product">
-                            <strong>${commerce.producte1}</strong>
-                            ${commerce.producte2 ? `<br><em>${commerce.producte2}</em>` : ''}
-                            <br><span style="color: #FF6B35; font-weight: bold;">${commerce.preu}</span>
-                        </div>
-                        <div style="color: #6B4423; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                            <i class="fas fa-map-marker-alt"></i> ${commerce.municipi}, ${commerce.comarca}
-                        </div>
-                        <div class="popup-actions">
-                            <button class="popup-btn popup-btn-primary" onclick="showCommerceDetail(${commerce.id})">
-                                Veure detalls
-                            </button>
-                            <button class="popup-btn popup-btn-secondary">
-                                <i class="fas fa-directions"></i> Com arribar
-                            </button>
-                        </div>
+            // Create popup content
+            const popupContent = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h4>${commerce.name}</h4>
+                        <span class="popup-category">${commerce.category}</span>
                     </div>
-                `;
-
-                marker.bindPopup(popupContent, {
-                    maxWidth: 300,
-                    className: 'custom-popup'
-                });
-                
-                markers.push(marker);
-            });
-        }
-
-        // Render commerce cards
-        function renderCommerceCards() {
-            const commerceGrid = document.querySelector('.commerce-grid');
-            commerceGrid.innerHTML = '';
-            
-            filteredCommerces.slice(0, 12).forEach(commerce => { // Show max 12 cards
-                const icon = categoryIcons[commerce.category] || '📦';
-                const cardDiv = document.createElement('article');
-                cardDiv.className = 'commerce-card';
-                cardDiv.onclick = () => showCommerceDetail(commerce.id);
-                
-                cardDiv.innerHTML = `
-                    <div class="commerce-header">
-                        <h3>${commerce.name}</h3>
-                        <div class="commerce-location">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${commerce.municipi}, ${commerce.comarca}</span>
-                        </div>
+                    <div class="popup-product">
+                        <strong>${commerce.producte}</strong>
+                        <span style="color: #FF6B35; font-weight: bold;">${commerce.preu}</span>
                     </div>
-                    <div class="commerce-body">
-                        <p class="commerce-description">
-                            ${commerce.adreca || 'Comerç local especialitzat en productes de qualitat.'}
-                        </p>
-                        <div class="product-showcase">
-                            <h4><i class="fas fa-star"></i> Producte${commerce.producte2 ? 's' : ''} Estrella</h4>
-                            <p><strong>${commerce.producte1}</strong></p>
-                            ${commerce.producte2 ? `<p><em>${commerce.producte2}</em></p>` : ''}
-                            <span class="product-price">${commerce.preu}</span>
-                        </div>
+                    <div style="color: #6B4423; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-map-marker-alt"></i> ${commerce.municipi}, ${commerce.comarca}
                     </div>
-                    <div class="commerce-footer">
-                        <span class="commerce-category">${commerce.category}</span>
-                        <div class="commerce-actions">
-                            <button class="action-btn"><i class="fas fa-heart"></i></button>
-                            <button class="action-btn"><i class="fas fa-share"></i></button>
-                        </div>
+                    <div class="popup-actions">
+                        <button class="popup-btn popup-btn-primary" onclick="showCommerceDetail(${commerce.id})">
+                            Veure detalls
+                        </button>
+                        <button class="popup-btn popup-btn-secondary">
+                            <i class="fas fa-directions"></i> Com arribar
+                        </button>
                     </div>
-                `;
-                
-                commerceGrid.appendChild(cardDiv);
-            });
-        }
+                </div>
+            `;
 
-        // Update results count
-        function updateResultsCount() {
-            const resultsCount = document.querySelector('.results-count');
-            const total = allCommerces.length;
-            const showing = Math.min(filteredCommerces.length, 12);
-            resultsCount.textContent = `Mostrant ${showing} de ${filteredCommerces.length} comerços (${total} total)`;
-        }
-
-        // Apply filters
-        function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCategories = Array.from(document.querySelectorAll('.category-filter input:checked'))
-                .map(cb => cb.nextElementSibling.textContent.trim());
-            
-            filteredCommerces = allCommerces.filter(commerce => {
-                // Category filter
-                if (!selectedCategories.includes(commerce.category)) return false;
-                
-                // Search filter
-                if (searchTerm && !commerce.name.toLowerCase().includes(searchTerm) && 
-                    !commerce.municipi.toLowerCase().includes(searchTerm) &&
-                    !commerce.producte1.toLowerCase().includes(searchTerm) &&
-                    !commerce.producte2.toLowerCase().includes(searchTerm)) {
-                    return false;
-                }
-                
-                return true;
+            marker.bindPopup(popupContent, {
+                maxWidth: 300,
+                className: 'custom-popup'
             });
-            
-            renderMarkers();
-            renderCommerceCards();
-            updateResultsCount();
-        }
+        });
 
         // Search function
         function searchCommerces() {
-            applyFilters();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const vegueria = document.getElementById('vegueriaSelect').value;
+            const comarca = document.getElementById('comarcaSelect').value;
+            const municipi = document.getElementById('municipiSelect').value;
+            
+            console.log('Searching for:', searchTerm, vegueria, comarca, municipi);
+            // Implement search logic here
         }
 
         // Show commerce detail
@@ -1230,10 +1179,12 @@
             // Add more vegueries...
         });
 
-        // Add search input listener
-        document.getElementById('searchInput').addEventListener('input', function() {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(applyFilters, 300); // Debounce search
+        // Filter by category
+        document.querySelectorAll('.category-filter input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                console.log('Filter changed:', this.id, this.checked);
+                // Implement filter logic
+            });
         });
 
         // Smooth scroll
@@ -1248,11 +1199,6 @@
                     });
                 }
             });
-        });
-
-        // Initialize data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
         });
     </script>
 </body>
