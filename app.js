@@ -3,6 +3,7 @@ let map;
 let markers = [];
 let allShops = [];
 let filteredShops = [];
+let geocodeCache = new Map(); // Cache per evitar crides repetides
 
 // Inicialització quan es carrega la pàgina
 document.addEventListener('DOMContentLoaded', function() {
@@ -36,7 +37,7 @@ async function loadShopsFromGoogleSheets() {
         const data = JSON.parse(jsonString);
         
         // Processar les dades
-        allShops = processGoogleSheetsData(data);
+        allShops = await processGoogleSheetsData(data);
         filteredShops = [...allShops];
         
         // Actualitzar interfície
@@ -51,8 +52,8 @@ async function loadShopsFromGoogleSheets() {
     }
 }
 
-// Processar dades de Google Sheets
-function processGoogleSheetsData(data) {
+// Processar dades de Google Sheets amb geocodificació
+async function processGoogleSheetsData(data) {
     const shops = [];
     const rows = data.table.rows;
     
@@ -62,24 +63,85 @@ function processGoogleSheetsData(data) {
         
         // Comprovar que la fila té dades i està activa
         if (row && row[12] && row[12].v === 'SI') {
-            shops.push({
+            const shop = {
                 name: row[0]?.v || '',
                 category: row[1]?.v || '',
                 product1: row[2]?.v || '',
                 product2: row[3]?.v || '',
                 description: row[4]?.v || '',
-                municipality: row[5]?.v || '',
-                comarca: row[6]?.v || '',
-                lat: parseFloat(row[7]?.v) || 0,
-                lng: parseFloat(row[8]?.v) || 0,
+                address: row[5]?.v || '',
+                postalCode: row[6]?.v || '',
+                municipality: row[7]?.v || '',
+                comarca: row[8]?.v || '',
                 phone: row[9]?.v || '',
                 email: row[10]?.v || '',
-                web: row[11]?.v || ''
-            });
+                web: row[11]?.v || '',
+                lat: null,
+                lng: null
+            };
+            
+            // Geocodificar l'adreça
+            if (shop.address && shop.municipality) {
+                const coords = await geocodeAddress(shop.address, shop.municipality, shop.postalCode);
+                if (coords) {
+                    shop.lat = coords.lat;
+                    shop.lng = coords.lng;
+                }
+            }
+            
+            shops.push(shop);
         }
     }
     
     return shops;
+}
+
+// Geocodificar adreça amb Nominatim
+async function geocodeAddress(address, municipality, postalCode = '') {
+    // Crear clau de cache
+    const cacheKey = `${address}, ${municipality}, ${postalCode}`.toLowerCase();
+    
+    // Comprovar cache
+    if (geocodeCache.has(cacheKey)) {
+        return geocodeCache.get(cacheKey);
+    }
+    
+    try {
+        // Construir query per Nominatim
+        const query = `${address}, ${municipality}, Catalunya, Spain`;
+        const encodedQuery = encodeURIComponent(query);
+        
+        // Cridar API de Nominatim amb límit de velocitat
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 segon entre crides
+        
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}&limit=1&countrycodes=es`
+        );
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            const coords = {
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon)
+            };
+            
+            // Guardar al cache
+            geocodeCache.set(cacheKey, coords);
+            
+            console.log(`Geocodificat: ${query} -> ${coords.lat}, ${coords.lng}`);
+            return coords;
+        } else {
+            console.warn(`No s'ha pogut geocodificar: ${query}`);
+            geocodeCache.set(cacheKey, null);
+            return null;
+        }
+        
+    } catch (error) {
+        console.error(`Error geocodificant ${address}:`, error);
+        geocodeCache.set(cacheKey, null);
+        return null;
+    }
 }
 
 // Actualitzar opcions dels filtres
@@ -121,12 +183,13 @@ function displayShops(shops) {
             <h3>${shop.name}</h3>
             <div class="shop-category">${shop.category}</div>
             <div class="shop-location">
-                <i class="fas fa-map-marker-alt"></i> ${shop.municipality}, ${shop.comarca}
+                <i class="fas fa-map-marker-alt"></i> ${shop.address ? shop.address + ', ' : ''}${shop.municipality}, ${shop.comarca}
             </div>
             <div class="shop-products">
                 ${shop.product1 ? `<span class="product-tag">${shop.product1}</span>` : ''}
                 ${shop.product2 ? `<span class="product-tag">${shop.product2}</span>` : ''}
             </div>
+            ${!shop.lat || !shop.lng ? '<div class="geocode-warning"><i class="fas fa-exclamation-triangle"></i> Adreça no localitzada</div>' : ''}
         </div>
     `).join('');
 }
@@ -137,49 +200,55 @@ function addMarkersToMap(shops) {
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
     
+    // Filtrar només comerços amb coordenades vàlides
+    const shopsWithCoords = shops.filter(shop => shop.lat && shop.lng);
+    
+    if (shopsWithCoords.length === 0) {
+        console.warn('Cap comerç té coordenades vàlides per mostrar al mapa');
+        return;
+    }
+    
     // Crear grup de marcadors per ajustar la vista
     const group = new L.featureGroup();
     
-    shops.forEach(shop => {
-        if (shop.lat && shop.lng) {
-            // Obtenir color segons categoria
-            const color = CONFIG.MARKER_COLORS[shop.category] || CONFIG.MARKER_COLORS.default;
-            
-            // Crear icona personalitzada
-            const icon = L.divIcon({
-                html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas ${CONFIG.CATEGORY_ICONS[shop.category] || CONFIG.CATEGORY_ICONS.default}" style="color: white; font-size: 14px;"></i>
-                </div>`,
-                className: 'custom-marker',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-            
-            // Crear marcador
-            const marker = L.marker([shop.lat, shop.lng], { icon: icon });
-            
-            // Afegir popup
-            const popupContent = `
-                <div class="popup-content">
-                    <h3>${shop.name}</h3>
-                    <div class="category">${shop.category}</div>
-                    <div>${shop.municipality}, ${shop.comarca}</div>
-                    <div class="products">
-                        <strong>Productes estrella:</strong><br>
-                        ${shop.product1 ? `• ${shop.product1}<br>` : ''}
-                        ${shop.product2 ? `• ${shop.product2}` : ''}
-                    </div>
-                    <a href="#" class="btn-details" onclick="showShopDetails('${encodeURIComponent(JSON.stringify(shop))}'); return false;">
-                        Més detalls
-                    </a>
+    shopsWithCoords.forEach(shop => {
+        // Obtenir color segons categoria
+        const color = CONFIG.MARKER_COLORS[shop.category] || CONFIG.MARKER_COLORS.default;
+        
+        // Crear icona personalitzada
+        const icon = L.divIcon({
+            html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center;">
+                <i class="fas ${CONFIG.CATEGORY_ICONS[shop.category] || CONFIG.CATEGORY_ICONS.default}" style="color: white; font-size: 14px;"></i>
+            </div>`,
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        // Crear marcador
+        const marker = L.marker([shop.lat, shop.lng], { icon: icon });
+        
+        // Afegir popup
+        const popupContent = `
+            <div class="popup-content">
+                <h3>${shop.name}</h3>
+                <div class="category">${shop.category}</div>
+                <div>${shop.address ? shop.address + ', ' : ''}${shop.municipality}, ${shop.comarca}</div>
+                <div class="products">
+                    <strong>Productes estrella:</strong><br>
+                    ${shop.product1 ? `• ${shop.product1}<br>` : ''}
+                    ${shop.product2 ? `• ${shop.product2}` : ''}
                 </div>
-            `;
-            
-            marker.bindPopup(popupContent);
-            marker.addTo(map);
-            markers.push(marker);
-            group.addLayer(marker);
-        }
+                <a href="#" class="btn-details" onclick="showShopDetails('${encodeURIComponent(JSON.stringify(shop))}'); return false;">
+                    Més detalls
+                </a>
+            </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        marker.addTo(map);
+        markers.push(marker);
+        group.addLayer(marker);
     });
     
     // Ajustar vista del mapa si hi ha marcadors
@@ -208,7 +277,8 @@ function showShopDetails(shopJson) {
         
         <div style="margin: 1.5rem 0;">
             <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">Ubicació</h3>
-            <p>${shop.municipality}, ${shop.comarca}</p>
+            <p>${shop.address ? shop.address + '<br>' : ''}${shop.municipality}, ${shop.comarca}</p>
+            ${shop.postalCode ? `<p>CP: ${shop.postalCode}</p>` : ''}
         </div>
         
         <div style="margin: 1.5rem 0;">
