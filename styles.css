@@ -24,6 +24,14 @@ body {
     background-color: var(--bg-light);
 }
 
+.geocode-warning {
+    color: #ff6b35;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
 .container {
     max-width: 1400px;
     margin: 0 auto;
@@ -339,4 +347,5 @@ body {
 
 .popup-content .btn-details:hover {
     background: var(--primary-color);
+
 }
