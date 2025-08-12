@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gustcat - Productes Estrella de Catalunya</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Gustcat</h1>
+                <p>Descobreix els productes estrella del comerç local català</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filtres -->
+    <section class="filters">
+        <div class="container">
+            <div class="filter-group">
+                <label for="comarca-filter">Comarca:</label>
+                <select id="comarca-filter">
+                    <option value="">Totes les comarques</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="municipi-filter">Municipi:</label>
+                <select id="municipi-filter">
+                    <option value="">Tots els municipis</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="categoria-filter">Categoria:</label>
+                <select id="categoria-filter">
+                    <option value="">Totes les categories</option>
+                    <option value="Carn">Carn (xai, vedella, porc, aviram)</option>
+                    <option value="Elaboradors">Elaboradors alimentaris</option>
+                    <option value="Embotits">Embotits propis</option>
+                    <option value="Begudes">Begudes artesanes</option>
+                    <option value="Formatges">Formatges i làctics</option>
+                    <option value="Oli">Oli i olives</option>
+                    <option value="Pa">Pa, pastissos</option>
+                    <option value="Peix">Peix, marisc</option>
+                    <option value="Llegums">Llegums</option>
+                    <option value="Pastes">Pastes, arròs, cereals</option>
+                    <option value="Fruita seca">Fruita seca</option>
+                    <option value="Fruita fresca">Fruita i verdures fresques</option>
+                    <option value="Mel">Mel i condiments</option>
+                    <option value="Restauració">Restauració</option>
+                </select>
+            </div>
+            
+            <button id="reset-filters" class="btn-reset">
+                <i class="fas fa-redo"></i> Restablir
+            </button>
+        </div>
+    </section>
+
+    <!-- Mapa i Llista -->
+    <main class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                <!-- Mapa -->
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+                
+                <!-- Llista de comerços -->
+                <div class="shops-list">
+                    <h2>Comerços Col·laboradors</h2>
+                    <div id="shops-container">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Carregant comerços...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Gustcat. Tots els drets reservats.</p>
+        </div>
+    </footer>
+
+    <!-- Modal per detalls -->
+    <div id="shop-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
