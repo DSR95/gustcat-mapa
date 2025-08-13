@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gustcat - Productes Estrella de Catalunya</title>
+    <title>GustCat - Descobreix els Sabors de Catalunya</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -11,39 +11,673 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2691E;
+            --accent-color: #FF6B35;
+            --text-dark: #2C1810;
+            --text-light: #6B4423;
+            --bg-light: #FFF8F3;
+            --bg-cream: #F5E6D3;
+            --border-color: #E8D5C4;
+            --success: #4CAF50;
+            --shadow: 0 2px 10px rgba(139, 69, 19, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .logo-space {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav a.active { 
+            color: var(--accent-color); 
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #FF8C42;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(139, 69, 19, 0.7), rgba(210, 105, 30, 0.7)),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23FFF8F3" width="1200" height="600"/><path fill="%23F5E6D3" d="M0 300L50 325L100 300L150 275L200 300L250 325L300 300L350 275L400 300L450 325L500 300L550 275L600 300L650 325L700 300L750 275L800 300L850 325L900 300L950 275L1000 300L1050 325L1100 300L1150 275L1200 300V600H0V300Z"/></svg>');
+            background-size: cover;
+            background-position: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .hero p { font-size: 1.3rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin: -2rem auto 3rem;
+            max-width: 1200px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-container {
+            display: grid;
+            grid-template-columns: 1fr 200px 200px 200px auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus { outline: none; border-color: var(--accent-color); }
+
+        select {
+            padding: 0.8rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus { outline: none; border-color: var(--accent-color); }
+
+        /* Map Container */
+        .map-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .filters-sidebar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-section { margin-bottom: 1.5rem; }
+        .filter-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem;
+        }
+        .filter-section h3 i { font-size: 1rem; }
+
+        .category-filters { display: flex; flex-direction: column; gap: 0.5rem; }
+        .category-filter {
+            display: flex; 
+            align-items: center; 
+            padding: 0.5rem; 
+            border-radius: 8px;
+            cursor: pointer; 
+            transition: background 0.3s;
+        }
+        .category-filter:hover { background: var(--bg-cream); }
+        .category-filter input[type="checkbox"] { 
+            margin-right: 0.8rem; 
+            width: 18px; 
+            height: 18px; 
+            cursor: pointer; 
+        }
+        .category-filter label { 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            flex: 1; 
+        }
+        .category-icon { 
+            width: 24px; 
+            height: 24px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%; 
+            background: var(--bg-cream); 
+            font-size: 0.8rem; 
+        }
+
+        #map { 
+            height: 600px; 
+            border-radius: 15px; 
+            box-shadow: var(--shadow); 
+            background: var(--bg-cream); 
+        }
+
+        /* Commerce Cards */
+        .results-section { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 0 2rem 3rem; 
+        }
+        .results-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem; 
+        }
+        .results-header h2 { 
+            color: var(--primary-color); 
+            font-size: 1.8rem; 
+        }
+        .results-count { 
+            color: var(--text-light); 
+            font-size: 1.1rem; 
+        }
+
+        .commerce-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .commerce-card {
+            background: white; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s; 
+            cursor: pointer;
+        }
+        .commerce-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 5px 20px rgba(139, 69, 19, 0.2); 
+        }
+
+        .commerce-header { 
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+            color: white; 
+            padding: 1.5rem; 
+        }
+        .commerce-header h3 { 
+            font-size: 1.3rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .commerce-location { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            font-size: 0.9rem; 
+            opacity: 0.9; 
+        }
+
+        .commerce-body { padding: 1.5rem; }
+        .commerce-description { 
+            color: var(--text-light); 
+            margin-bottom: 1rem; 
+            line-height: 1.5; 
+        }
+
+        .product-showcase { 
+            background: var(--bg-cream); 
+            border-radius: 10px; 
+            padding: 1rem; 
+            margin-bottom: 1rem; 
+        }
+        .product-showcase h4 { 
+            color: var(--primary-color); 
+            font-size: 1rem; 
+            margin-bottom: 0.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+        }
+        .product-showcase p { 
+            color: var(--text-light); 
+            font-size: 0.9rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .product-price { 
+            color: var(--accent-color); 
+            font-weight: bold; 
+        }
+
+        .commerce-footer { 
+            padding: 1rem 1.5rem; 
+            background: var(--bg-light); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .commerce-category { 
+            display: inline-block; 
+            padding: 0.3rem 0.8rem; 
+            background: var(--primary-color); 
+            color: white; 
+            border-radius: 15px; 
+            font-size: 0.85rem; 
+        }
+        .commerce-actions { 
+            display: flex; 
+            gap: 1rem; 
+        }
+        .action-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-light); 
+            cursor: pointer; 
+            font-size: 1.2rem; 
+            transition: color 0.3s; 
+        }
+        .action-btn:hover { 
+            color: var(--accent-color); 
+        }
+
+        /* Registre Section */
+        .section {
+            max-width: 1200px; 
+            margin: 0 auto 3rem; 
+            padding: 0 2rem;
+        }
+        .section h2 {
+            color: var(--primary-color); 
+            margin-bottom: 1rem;
+        }
+        .form-card {
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+        .form-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 1rem;
+        }
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.35rem; 
+        }
+        .form-group label { 
+            font-weight: 600; 
+            color: var(--text-dark); 
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 0.7rem 0.9rem; 
+            border: 2px solid var(--border-color); 
+            border-radius: 10px; 
+            font-size: 0.95rem;
+            background: #fff;
+        }
+        .form-group textarea { 
+            min-height: 90px; 
+            resize: vertical; 
+        }
+        .note { 
+            color: var(--text-light); 
+            font-size: 0.9rem; 
+        }
+
+        /* Contacte Section */
+        .contact-info {
+            background: var(--bg-cream);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer { 
+            background: var(--text-dark); 
+            color: white; 
+            padding: 3rem 2rem 1rem; 
+            margin-top: 4rem; 
+        }
+        .footer-content {
+            max-width: 1400px; 
+            margin: 0 auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 2rem; 
+            margin-bottom: 2rem;
+        }
+        .footer-section h3 { 
+            color: var(--accent-color); 
+            margin-bottom: 1rem; 
+        }
+        .footer-section ul { 
+            list-style: none; 
+        }
+        .footer-section ul li { 
+            margin-bottom: 0.5rem; 
+        }
+        .footer-section a { 
+            color: #ccc; 
+            text-decoration: none; 
+            transition: color 0.3s; 
+        }
+        .footer-section a:hover { 
+            color: var(--accent-color); 
+        }
+        .footer-bottom { 
+            text-align: center; 
+            padding-top: 2rem; 
+            border-top: 1px solid #444; 
+            color: #999; 
+        }
+
+        /* Popup Styles */
+        .leaflet-popup-content { 
+            margin: 0; 
+            padding: 0; 
+            min-width: 260px; 
+        }
+        .popup-content { 
+            padding: 1rem; 
+        }
+        .popup-header { 
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+            color: white; 
+            padding: 0.8rem; 
+            margin: -1px -1px 0.8rem -1px; 
+        }
+        .popup-header h4 { 
+            margin: 0; 
+            font-size: 1.1rem; 
+        }
+        .popup-category { 
+            display: inline-block; 
+            padding: 0.2rem 0.6rem; 
+            background: rgba(255, 255, 255, 0.2); 
+            border-radius: 10px; 
+            font-size: 0.75rem; 
+            margin-top: 0.3rem; 
+        }
+        .popup-product { 
+            background: var(--bg-cream); 
+            padding: 0.5rem; 
+            border-radius: 5px; 
+            margin-bottom: 0.5rem; 
+        }
+        .popup-product strong { 
+            color: var(--primary-color); 
+            display: block; 
+            margin-bottom: 0.2rem; 
+        }
+        .popup-actions { 
+            display: flex; 
+            gap: 0.5rem; 
+            margin-top: 0.8rem; 
+        }
+        .popup-btn { 
+            flex: 1; 
+            padding: 0.4rem; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            transition: all 0.3s; 
+        }
+        .popup-btn-primary { 
+            background: var(--accent-color); 
+            color: white; 
+        }
+        .popup-btn-primary:hover { 
+            background: #FF8C42; 
+        }
+        .popup-btn-secondary { 
+            background: var(--border-color); 
+            color: var(--text-dark); 
+        }
+        .popup-btn-secondary:hover { 
+            background: var(--bg-cream); 
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--text-dark);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Animacions */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) { 
+            .search-container { 
+                grid-template-columns: 1fr; 
+            } 
+        }
+        @media (max-width: 968px) {
+            .map-container { 
+                grid-template-columns: 1fr; 
+            }
+            .filters-sidebar { 
+                position: static; 
+                margin-bottom: 2rem; 
+            }
+            .hero h1 { 
+                font-size: 2rem; 
+            }
+            .commerce-grid { 
+                grid-template-columns: 1fr; 
+            }
+        }
+        @media (max-width: 768px) {
+            .header-content { 
+                flex-direction: column; 
+                gap: 1rem; 
+            }
+            nav ul { 
+                flex-wrap: wrap; 
+                justify-content: center; 
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <h1>Gustcat</h1>
-                <p>Descobreix els productes estrella del comerç local català</p>
-            </div>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo" onclick="showTab('inici')">
+                <div class="logo-space">LOGO</div>
+                GustCat
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="showTab('inici')" id="tab-inici">Inici</a></li>
+                    <li><a href="#" onclick="showTab('mapa')" id="tab-mapa">Mapa interactiu</a></li>
+                    <li><a href="#" onclick="showTab('registre')" id="tab-registre" class="btn-primary">Afegeix el teu Comerç</a></li>
+                    <li><a href="#" onclick="showTab('contacte')" id="tab-contacte">Contacte</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <!-- Filtres -->
-    <section class="filters">
-        <div class="container">
-            <div class="filter-group">
-                <label for="comarca-filter">Comarca:</label>
+    <!-- Tab Content: Inici -->
+    <div id="content-inici" class="tab-content active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Descobreix els Sabors Autèntics de Catalunya</h1>
+            <p>Troba els millors productes artesans i especialitats locals dels comerços tradicionals catalans</p>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Cerca per nom, producte o municipi..." id="searchInput">
                 <select id="comarca-filter">
                     <option value="">Totes les comarques</option>
                 </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="municipi-filter">Municipi:</label>
                 <select id="municipi-filter">
                     <option value="">Tots els municipis</option>
                 </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="categoria-filter">Categoria:</label>
                 <select id="categoria-filter">
                     <option value="">Totes les categories</option>
                     <option value="Carn">Carn (xai, vedella, porc, aviram)</option>
@@ -61,41 +695,244 @@
                     <option value="Mel">Mel i condiments</option>
                     <option value="Restauració">Restauració</option>
                 </select>
+                <button class="btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-search"></i> Cercar
+                </button>
             </div>
-            
-            <button id="reset-filters" class="btn-reset">
-                <i class="fas fa-redo"></i> Restablir
-            </button>
-        </div>
-    </section>
+        </section>
 
-    <!-- Mapa i Llista -->
-    <main class="main-content">
-        <div class="container">
-            <div class="content-grid">
-                <!-- Mapa -->
-                <div class="map-container">
-                    <div id="map"></div>
+        <!-- Results Section -->
+        <section class="results-section">
+            <div class="results-header">
+                <h2>Comerços Col·laboradors</h2>
+                <span class="results-count" id="resultsCount">Carregant...</span>
+            </div>
+            <div class="commerce-grid" id="shops-container">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Carregant comerços...
                 </div>
-                
-                <!-- Llista de comerços -->
-                <div class="shops-list">
-                    <h2>Comerços Col·laboradors</h2>
-                    <div id="shops-container">
-                        <div class="loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            Carregant comerços...
+            </div>
+        </section>
+    </div>
+
+    <!-- Tab Content: Mapa -->
+    <div id="content-mapa" class="tab-content">
+        <!-- Map and Filters -->
+        <section class="map-container">
+            <aside class="filters-sidebar">
+                <div class="filter-section">
+                    <h3><i class="fas fa-filter"></i> Categories</h3>
+                    <div class="category-filters" id="categoryFilters">
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-carn" data-cat="carn" checked>
+                            <label for="cat-carn"><span class="category-icon">🥩</span> Carn</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-embotits" data-cat="embotits" checked>
+                            <label for="cat-embotits"><span class="category-icon">🌭</span> Embotits</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-formatges" data-cat="formatge" checked>
+                            <label for="cat-formatges"><span class="category-icon">🧀</span> Formatges i làctics</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-begudes" data-cat="begudes" checked>
+                            <label for="cat-begudes"><span class="category-icon">🍷</span> Begudes</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-pa" data-cat="pa" checked>
+                            <label for="cat-pa"><span class="category-icon">🥐</span> Pa i pastisseria</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-peix" data-cat="peix" checked>
+                            <label for="cat-peix"><span class="category-icon">🐟</span> Peix i marisc</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-oli" data-cat="oli" checked>
+                            <label for="cat-oli"><span class="category-icon">🫒</span> Oli i olives</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-llegums" data-cat="llegums" checked>
+                            <label for="cat-llegums"><span class="category-icon">🫘</span> Llegums</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-pasta" data-cat="pasta" checked>
+                            <label for="cat-pasta"><span class="category-icon">🍝</span> Pastes / arròs / cereals</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-fruita" data-cat="fruita" checked>
+                            <label for="cat-fruita"><span class="category-icon">🍎</span> Fruita i verdures</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-fruita-seca" data-cat="fruita seca" checked>
+                            <label for="cat-fruita-seca"><span class="category-icon">🥜</span> Fruita seca</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-mel" data-cat="mel" checked>
+                            <label for="cat-mel"><span class="category-icon">🍯</span> Mel i condiments</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-conserves" data-cat="conserves" checked>
+                            <label for="cat-conserves"><span class="category-icon">🥫</span> Conserves</label>
+                        </div>
+                        <div class="category-filter">
+                            <input type="checkbox" id="cat-restauracio" data-cat="restauracio" checked>
+                            <label for="cat-restauracio"><span class="category-icon">🍽️</span> Restauració</label>
                         </div>
                     </div>
                 </div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="applyFilters()">
+                    Aplicar Filtres
+                </button>
+            </aside>
+
+            <div id="map"></div>
+        </section>
+    </div>
+
+    <!-- Tab Content: Registre -->
+    <div id="content-registre" class="tab-content">
+        <section class="section">
+            <h2>Afegeix el teu comerç</h2>
+            <p class="note">Omple el formulari i el revisarem. Més endavant connectarem aquest formulari amb la base de dades.</p>
+            <div class="form-card">
+                <form id="registerForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_nom">Nom del comerç</label>
+                            <input id="f_nom" name="nom" placeholder="Ex: Cal Pepet" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="f_comarca">Comarca</label>
+                            <input id="f_comarca" name="comarca" placeholder="Ex: Garrotxa">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_muni">Municipi</label>
+                            <input id="f_muni" name="municipi" placeholder="Ex: Olot">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="f_adreca">Adreça</label>
+                            <input id="f_adreca" name="adreca" placeholder="Carrer, número, CP, municipi">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_tel">Telèfon</label>
+                            <input id="f_tel" name="telefon" placeholder="+34 ...">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_email">Email</label>
+                            <input id="f_email" name="email" type="email" placeholder="exemple@domini.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_web">Web</label>
+                            <input id="f_web" name="web" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 1.2rem 0 0.6rem; color: var(--secondary-color);">Producte estrella 1</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_p1_nom">Nom</label>
+                            <input id="f_p1_nom" name="producte1_nom" placeholder="Ex: Llonganissa de Vic IGP">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_p1_cat">Categoria</label>
+                            <input id="f_p1_cat" name="producte1_categoria" placeholder="Ex: Embotits">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_p1_preu">Preu</label>
+                            <input id="f_p1_preu" name="producte1_preu" placeholder="Ex: 12€/kg">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="f_p1_desc">Descripció</label>
+                            <textarea id="f_p1_desc" name="producte1_descripcio" placeholder="Descripció del producte"></textarea>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 1.2rem 0 0.6rem; color: var(--secondary-color);">Producte estrella 2 (opcional)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f_p2_nom">Nom</label>
+                            <input id="f_p2_nom" name="producte2_nom">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_p2_cat">Categoria</label>
+                            <input id="f_p2_cat" name="producte2_categoria">
+                        </div>
+                        <div class="form-group">
+                            <label for="f_p2_preu">Preu</label>
+                            <input id="f_p2_preu" name="producte2_preu">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="f_p2_desc">Descripció</label>
+                            <textarea id="f_p2_desc" name="producte2_descripcio"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem; display: flex; gap: 0.75rem; align-items: center;">
+                        <button type="submit" class="btn-primary">Enviar</button>
+                        <span class="note">Enviarem la teva sol·licitud i ens posarem en contacte.</span>
+                    </div>
+                </form>
             </div>
-        </div>
-    </main>
+        </section>
+    </div>
+
+    <!-- Tab Content: Contacte -->
+    <div id="content-contacte" class="tab-content">
+        <section class="section">
+            <h2>Contacte</h2>
+            <div class="form-card">
+                <p>Posa't en contacte amb nosaltres per qualsevol consulta sobre GustCat.</p>
+                <div class="contact-info">
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                        <li style="margin-bottom: 1rem;"><i class="fas fa-envelope" style="margin-right: 0.5rem; color: var(--accent-color);"></i> info@gustcat.cat</li>
+                        <li style="margin-bottom: 1rem;"><i class="fas fa-phone" style="margin-right: 0.5rem; color: var(--accent-color);"></i> 93 123 45 67</li>
+                        <li><i class="fas fa-map-marker-alt" style="margin-right: 0.5rem; color: var(--accent-color);"></i> Barcelona, Catalunya</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Gustcat. Tots els drets reservats.</p>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>GustCat</h3>
+                <p>La plataforma per descobrir els millors productes artesans i comerços locals de Catalunya.</p>
+                <div style="margin-top: 1rem;">
+                    <a href="#" style="margin-right: 1rem;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="margin-right: 1rem;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="margin-right: 1rem;"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Per a Comerços</h3>
+                <ul>
+                    <li><a href="#" onclick="showTab('registre')">Afegeix el teu comerç</a></li>
+                    <li><a href="#" onclick="showTab('mapa')">Mapa de comerços</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Descobreix</h3>
+                <ul>
+                    <li><a href="#" onclick="showTab('mapa')">Mapa de comerços</a></li>
+                    <li><a href="#" onclick="showTab('inici')">Productes destacats</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contacte</h3>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> info@gustcat.cat</li>
+                    <li><i class="fas fa-phone"></i> 93 123 45 67</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Barcelona, Catalunya</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 GustCat. Tots els drets reservats. | <a href="#">Política de Privacitat</a> | <a href="#">Termes d'Ús</a></p>
         </div>
     </footer>
 
@@ -111,5 +948,55 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="config.js"></script>
     <script src="app.js"></script>
+    
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all nav links
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(`content-${tabName}`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Add active class to selected nav link
+            const selectedLink = document.getElementById(`tab-${tabName}`);
+            if (selectedLink) {
+                selectedLink.classList.add('active');
+            }
+            
+            // Initialize map when mapa tab is shown
+            if (tabName === 'mapa' && typeof map !== 'undefined') {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+            }
+        }
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Gràcies! Hem rebut la teva sol·licitud. Properament connectarem aquest formulari amb la base de dades.');
+            this.reset();
+        });
+
+        // Search input functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            }
+        });
+    </script>
 </body>
 </html>
