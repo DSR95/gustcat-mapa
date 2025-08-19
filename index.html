@@ -1090,7 +1090,6 @@
             </nav>
         </div>
     </header>
-
     <!-- Tab Content: Inici -->
     <div id="content-inici" class="tab-content active">
         <!-- Hero Section -->
@@ -1475,20 +1474,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
             crossorigin=""></script>
-    <script>
-function showTab(tabName) {
-    // Amagar tots els tabs
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.style.display = 'none');
-    
-    // Mostrar el tab seleccionat
-    const selectedTab = document.getElementById(tabName);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    }
-}
-</script>
-    <script>
+            <script>
         // Variables globals
         let map;
         let markers = [];
@@ -1540,32 +1526,52 @@ function showTab(tabName) {
             }
         };
 
-        // Tab functionality
+        // ================= FUNCIÓ SHOWTAB CORREGIDA =================
         function showTab(tabName) {
+            console.log('Changing to tab:', tabName);
+            
+            // Amagar tots els tabs
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             
+            // Eliminar active de tots els links de navegació
             document.querySelectorAll('nav a').forEach(link => {
                 link.classList.remove('active');
             });
             
+            // Mostrar el tab seleccionat
             const selectedContent = document.getElementById(`content-${tabName}`);
             if (selectedContent) {
                 selectedContent.classList.add('active');
+                console.log('Tab content shown:', `content-${tabName}`);
+            } else {
+                console.error('Tab content not found:', `content-${tabName}`);
             }
             
+            // Activar el link corresponent
             const selectedLink = document.getElementById(`tab-${tabName}`);
             if (selectedLink) {
                 selectedLink.classList.add('active');
+                console.log('Tab link activated:', `tab-${tabName}`);
             }
             
-            if (tabName === 'mapa' && map) {
+            // Si és el mapa, inicialitzar-lo i ajustar la mida
+            if (tabName === 'mapa') {
                 setTimeout(() => {
-                    map.invalidateSize();
-                    if (markers.length > 0) {
-                        const group = new L.featureGroup(markers);
-                        map.fitBounds(group.getBounds().pad(0.1));
+                    if (map) {
+                        map.invalidateSize();
+                        console.log('Map size invalidated');
+                        
+                        // Si hi ha marcadors, ajustar la vista
+                        if (markers.length > 0) {
+                            const group = new L.featureGroup(markers);
+                            map.fitBounds(group.getBounds().pad(0.1));
+                            console.log('Map bounds fitted to markers');
+                        }
+                    } else {
+                        console.log('Map not initialized yet, initializing...');
+                        initMap();
                     }
                 }, 100);
             }
@@ -1575,18 +1581,28 @@ function showTab(tabName) {
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing...');
             
+            // Esperar que Leaflet es carregui
             if (typeof L === 'undefined') {
+                console.log('Leaflet not ready, waiting...');
                 setTimeout(() => {
-                    initMap();
-                    loadShopsFromGoogleSheets();
-                    setupEventListeners();
+                    initializeApp();
                 }, 1000);
             } else {
+                console.log('Leaflet ready, initializing app...');
+                initializeApp();
+            }
+        });
+
+        function initializeApp() {
+            try {
                 initMap();
                 loadShopsFromGoogleSheets();
                 setupEventListeners();
+                console.log('App initialized successfully');
+            } catch (error) {
+                console.error('Error initializing app:', error);
             }
-        });
+        }
 
         // Inicialitzar mapa
         function initMap() {
@@ -1595,6 +1611,7 @@ function showTab(tabName) {
                     throw new Error('Leaflet not loaded');
                 }
                 
+                console.log('Initializing map...');
                 map = L.map('map').setView(CONFIG.MAP_CENTER, CONFIG.MAP_ZOOM);
                 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1602,15 +1619,29 @@ function showTab(tabName) {
                 }).addTo(map);
                 
                 console.log('Map initialized successfully');
+                return true;
             } catch (error) {
                 console.error('Error initializing map:', error);
+                // Mostrar missatge d'error al contenidor del mapa
+                document.getElementById('map').innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-cream); color: var(--text-light);">
+                        <div style="text-align: center;">
+                            <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <h3>Error carregant el mapa</h3>
+                            <p>Prova actualitzar la pàgina</p>
+                        </div>
+                    </div>
+                `;
+                return false;
             }
         }
 
         // Carregar dades de Google Sheets
         async function loadShopsFromGoogleSheets() {
             try {
+                console.log('Loading shops from Google Sheets...');
                 showLoadingSpinner();
+                
                 const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${CONFIG.SHEET_NAME}`;
                 
                 const response = await fetch(url);
@@ -1619,9 +1650,6 @@ function showTab(tabName) {
                 const data = JSON.parse(jsonString);
                 
                 allShops = await processGoogleSheetsData(data);
-                filtere
-                // CONTINUACIÓ DEL JAVASCRIPT - Afegeix això just després de la línia "allShops = await processGoogleSheetsData(data);"
-
                 filteredShops = [...allShops];
                 
                 updateFilters();
@@ -1634,6 +1662,8 @@ function showTab(tabName) {
                 
             } catch (error) {
                 console.error('Error loading data:', error);
+                console.log('Using sample data instead...');
+                
                 allShops = getSampleData();
                 filteredShops = [...allShops];
                 
@@ -1706,6 +1736,7 @@ function showTab(tabName) {
                         lng: parseFloat(data[0].lon)
                     };
                     geocodeCache.set(address, coords);
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Rate limiting
                     return coords;
                 }
             } catch (error) {
@@ -1720,8 +1751,7 @@ function showTab(tabName) {
             geocodeCache.set(address, randomCoords);
             return randomCoords;
         }
-
-        // Obtenir dades de mostra
+                // Obtenir dades de mostra
         function getSampleData() {
             return [
                 {
@@ -1828,21 +1858,26 @@ function showTab(tabName) {
             const municipis = [...new Set(allShops.map(s => s.municipi).filter(Boolean))].sort();
             
             const comarcaFilter = document.getElementById('comarca-filter');
-            comarcaFilter.innerHTML = '<option value="">📍 Totes les comarques</option>';
-            comarques.forEach(comarca => {
-                comarcaFilter.innerHTML += `<option value="${comarca}">${comarca}</option>`;
-            });
+            if (comarcaFilter) {
+                comarcaFilter.innerHTML = '<option value="">📍 Totes les comarques</option>';
+                comarques.forEach(comarca => {
+                    comarcaFilter.innerHTML += `<option value="${comarca}">${comarca}</option>`;
+                });
+            }
             
             const municipiFilter = document.getElementById('municipi-filter');
-            municipiFilter.innerHTML = '<option value="">🏘️ Tots els municipis</option>';
-            municipis.forEach(municipi => {
-                municipiFilter.innerHTML += `<option value="${municipi}">${municipi}</option>`;
-            });
+            if (municipiFilter) {
+                municipiFilter.innerHTML = '<option value="">🏘️ Tots els municipis</option>';
+                municipis.forEach(municipi => {
+                    municipiFilter.innerHTML += `<option value="${municipi}">${municipi}</option>`;
+                });
+            }
         }
 
         // Mostrar comerços
         function displayShops(shops) {
             const container = document.getElementById('shops-container');
+            if (!container) return;
             
             if (shops.length === 0) {
                 container.innerHTML = `
@@ -1903,12 +1938,24 @@ function showTab(tabName) {
         function getCategoryIcon(category) {
             return CONFIG.CATEGORY_ICONS[category] || CONFIG.CATEGORY_ICONS.default;
         }
-
-        // Afegir marcadors al mapa
+                // Afegir marcadors al mapa
         function addMarkersToMap(shops) {
+            if (!map) {
+                console.error('Map not initialized');
+                return;
+            }
+            
             // Eliminar marcadors existents
-            markers.forEach(marker => map.removeLayer(marker));
+            markers.forEach(marker => {
+                try {
+                    map.removeLayer(marker);
+                } catch (e) {
+                    console.warn('Error removing marker:', e);
+                }
+            });
             markers = [];
+            
+            console.log(`Adding ${shops.length} markers to map`);
             
             shops.forEach(shop => {
                 if (shop.lat && shop.lng) {
@@ -1921,18 +1968,27 @@ function showTab(tabName) {
                         iconAnchor: [15, 15]
                     });
                     
-                    const marker = L.marker([shop.lat, shop.lng], { icon })
-                        .bindPopup(createPopupContent(shop))
-                        .addTo(map);
-                    
-                    markers.push(marker);
+                    try {
+                        const marker = L.marker([shop.lat, shop.lng], { icon })
+                            .bindPopup(createPopupContent(shop))
+                            .addTo(map);
+                        
+                        markers.push(marker);
+                    } catch (error) {
+                        console.error('Error adding marker for shop:', shop.nom, error);
+                    }
                 }
             });
             
             // Ajustar vista del mapa
             if (markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                map.fitBounds(group.getBounds().pad(0.1));
+                try {
+                    const group = new L.featureGroup(markers);
+                    map.fitBounds(group.getBounds().pad(0.1));
+                    console.log(`Map fitted to ${markers.length} markers`);
+                } catch (error) {
+                    console.error('Error fitting map bounds:', error);
+                }
             }
         }
 
@@ -1976,9 +2032,19 @@ function showTab(tabName) {
         // Mostrar detalls del comerç
         function showShopDetails(index) {
             const shop = allShops[index];
+            if (!shop) {
+                console.error('Shop not found at index:', index);
+                return;
+            }
+            
             const modal = document.getElementById('shop-modal');
             const headerContent = document.getElementById('modal-header-content');
             const bodyContent = document.getElementById('modal-body');
+            
+            if (!modal || !headerContent || !bodyContent) {
+                console.error('Modal elements not found');
+                return;
+            }
             
             headerContent.innerHTML = `
                 <h2>${shop.nom}</h2>
@@ -2017,10 +2083,10 @@ function showTab(tabName) {
 
         // Aplicar filtres
         function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedComarca = document.getElementById('comarca-filter').value;
-            const selectedMunicipi = document.getElementById('municipi-filter').value;
-            const selectedCategoria = document.getElementById('categoria-filter').value;
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const selectedComarca = document.getElementById('comarca-filter')?.value || '';
+            const selectedMunicipi = document.getElementById('municipi-filter')?.value || '';
+            const selectedCategoria = document.getElementById('categoria-filter')?.value || '';
             
             filteredShops = allShops.filter(shop => {
                 const matchSearch = !searchTerm || 
@@ -2040,6 +2106,8 @@ function showTab(tabName) {
             
             displayShops(filteredShops);
             updateResultsCount();
+            
+            console.log(`Filtered shops: ${filteredShops.length} of ${allShops.length}`);
         }
 
         // Aplicar filtres del mapa
@@ -2047,11 +2115,14 @@ function showTab(tabName) {
             const checkedCategories = Array.from(document.querySelectorAll('#categoryFilters input:checked'))
                 .map(input => input.dataset.cat);
             
+            console.log('Applying map filters for categories:', checkedCategories);
+            
             const filtered = allShops.filter(shop => 
                 checkedCategories.includes(shop.producte1_categoria) ||
                 checkedCategories.includes(shop.producte2_categoria)
             );
             
+            console.log(`Map filtered: ${filtered.length} shops`);
             addMarkersToMap(filtered);
         }
 
@@ -2070,6 +2141,8 @@ function showTab(tabName) {
             const gridBtn = document.querySelector('.view-btn:first-child');
             const listBtn = document.querySelector('.view-btn:last-child');
             
+            if (!container || !gridBtn || !listBtn) return;
+            
             if (mode === 'grid') {
                 container.className = 'commerce-grid fade-in-stagger';
                 gridBtn.classList.add('active');
@@ -2080,9 +2153,10 @@ function showTab(tabName) {
                 listBtn.classList.add('active');
             }
         }
-
-        // Configurar event listeners
+                // Configurar event listeners
         function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
             // Cerca en temps real
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
@@ -2093,9 +2167,13 @@ function showTab(tabName) {
             }
             
             // Filtres
-            document.getElementById('comarca-filter')?.addEventListener('change', applyFilters);
-            document.getElementById('municipi-filter')?.addEventListener('change', applyFilters);
-            document.getElementById('categoria-filter')?.addEventListener('change', applyFilters);
+            const comarcaFilter = document.getElementById('comarca-filter');
+            const municipiFilter = document.getElementById('municipi-filter');
+            const categoriaFilter = document.getElementById('categoria-filter');
+            
+            if (comarcaFilter) comarcaFilter.addEventListener('change', applyFilters);
+            if (municipiFilter) municipiFilter.addEventListener('change', applyFilters);
+            if (categoriaFilter) categoriaFilter.addEventListener('change', applyFilters);
             
             // Modal
             const modal = document.getElementById('shop-modal');
@@ -2107,6 +2185,7 @@ function showTab(tabName) {
                 }
             }
             
+            // Tancar modal fent clic fora
             window.onclick = function(event) {
                 if (event.target == modal) {
                     modal.style.display = 'none';
@@ -2118,6 +2197,16 @@ function showTab(tabName) {
             if (registerForm) {
                 registerForm.addEventListener('submit', handleRegisterSubmit);
             }
+            
+            // Event listeners per filtres del mapa
+            document.querySelectorAll('#categoryFilters input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    // Auto-aplicar filtres quan es canvia un checkbox
+                    setTimeout(applyMapFilters, 100);
+                });
+            });
+            
+            console.log('Event listeners set up successfully');
         }
 
         // Gestionar enviament del formulari
@@ -2152,6 +2241,7 @@ function showTab(tabName) {
         }
 
         function showMessage(message, type) {
+            // Eliminar missatge existent
             const existingMessage = document.querySelector('.success-message, .error-message');
             if (existingMessage) {
                 existingMessage.remove();
@@ -2166,8 +2256,11 @@ function showTab(tabName) {
             
             document.body.appendChild(messageDiv);
             
+            // Eliminar després de 5 segons
             setTimeout(() => {
-                messageDiv.remove();
+                if (messageDiv && messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
             }, 5000);
         }
 
@@ -2187,3 +2280,61 @@ function showTab(tabName) {
         function hideLoadingSpinner() {
             // El spinner s'elimina automàticament quan es mostren els comerços
         }
+
+        // Funció auxiliar per debug
+        function debugInfo() {
+            console.log('=== DEBUG INFO ===');
+            console.log('Map object:', map);
+            console.log('All shops:', allShops.length);
+            console.log('Filtered shops:', filteredShops.length);
+            console.log('Markers:', markers.length);
+            console.log('Current tab:', document.querySelector('.tab-content.active')?.id);
+            console.log('==================');
+        }
+
+        // Exposar funcions globals per debug (opcional)
+        window.gustcatDebug = {
+            showTab,
+            map: () => map,
+            shops: () => allShops,
+            debugInfo
+        };
+
+        // Gestió d'errors globals
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            
+            // Si és un error de mapa, mostrar missatge
+            if (e.error && e.error.message && e.error.message.includes('map')) {
+                showErrorMessage('Error amb el mapa. Prova actualitzar la pàgina.');
+            }
+        });
+
+        // Detectar quan la pàgina està completament carregada
+        window.addEventListener('load', function() {
+            console.log('Page fully loaded');
+            
+            // Verificar que tot estigui funcionant
+            setTimeout(() => {
+                if (!map) {
+                    console.warn('Map still not initialized, retrying...');
+                    initMap();
+                }
+                
+                if (allShops.length === 0) {
+                    console.warn('No shops loaded, loading sample data...');
+                    allShops = getSampleData();
+                    filteredShops = [...allShops];
+                    updateFilters();
+                    displayShops(filteredShops);
+                    addMarkersToMap(filteredShops);
+                    updateResultsCount();
+                }
+            }, 2000);
+        });
+
+    </script>
+</body>
+</html>
+                
+                
