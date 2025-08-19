@@ -960,6 +960,23 @@
             box-shadow: var(--shadow-heavy);
         }
 
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: slideInFromTop 0.5s ease;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1001;
+            box-shadow: var(--shadow-heavy);
+        }
+
         @keyframes slideInFromTop {
             from {
                 transform: translateY(-100%);
@@ -1590,6 +1607,9 @@
                 const data = JSON.parse(jsonString);
                 
                 allShops = await processGoogleSheetsData(data);
+                filtere
+                // CONTINUACIÓ DEL JAVASCRIPT - Afegeix això just després de la línia "allShops = await processGoogleSheetsData(data);"
+
                 filteredShops = [...allShops];
                 
                 updateFilters();
@@ -1613,4 +1633,545 @@
                 hideLoadingSpinner();
                 showErrorMessage('Error carregant Google Sheet. Mostrant dades de mostra.');
             }
+        }
+
+        // Processar dades de Google Sheets
+        async function processGoogleSheetsData(data) {
+            const rows = data.table.rows;
+            const shops = [];
+            
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row.c || row.c.length < 10) continue;
+                
+                const shop = {
+                    nom: row.c[0]?.v || '',
+                    comarca: row.c[1]?.v || '',
+                    municipi: row.c[2]?.v || '',
+                    adreca: row.c[3]?.v || '',
+                    telefon: row.c[4]?.v || '',
+                    email: row.c[5]?.v || '',
+                    web: row.c[6]?.v || '',
+                    producte1_nom: row.c[7]?.v || '',
+                    producte1_categoria: row.c[8]?.v || '',
+                    producte1_preu: row.c[9]?.v || '',
+                    producte1_descripcio: row.c[10]?.v || '',
+                    producte2_nom: row.c[11]?.v || '',
+                    producte2_categoria: row.c[12]?.v || '',
+                    producte2_preu: row.c[13]?.v || '',
+                    producte2_descripcio: row.c[14]?.v || '',
+                    lat: null,
+                    lng: null
+                };
+                
+                if (shop.nom) {
+                    // Geocodificar adreça
+                    const coords = await geocodeAddress(shop.adreca || `${shop.municipi}, Catalunya`);
+                    if (coords) {
+                        shop.lat = coords.lat;
+                        shop.lng = coords.lng;
+                    }
+                    shops.push(shop);
+                }
+            }
+            
+            return shops;
+        }
+
+        // Geocodificar adreça
+        async function geocodeAddress(address) {
+            if (geocodeCache.has(address)) {
+                return geocodeCache.get(address);
+            }
+            
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const coords = {
+                        lat: parseFloat(data[0].lat),
+                        lng: parseFloat(data[0].lon)
+                    };
+                    geocodeCache.set(address, coords);
+                    return coords;
+                }
+            } catch (error) {
+                console.error('Error geocoding:', error);
+            }
+            
+            // Si no es pot geocodificar, retornar coordenades aleatòries a Catalunya
+            const randomCoords = {
+                lat: 41.5 + Math.random() * 1.5,
+                lng: 0.5 + Math.random() * 2.5
+            };
+            geocodeCache.set(address, randomCoords);
+            return randomCoords;
+        }
+
+        // Obtenir dades de mostra
+        function getSampleData() {
+            return [
+                {
+                    nom: "Can Roca - Carnisseria Artesana",
+                    comarca: "Osona",
+                    municipi: "Vic",
+                    adreca: "Plaça Major, 15, 08500 Vic",
+                    telefon: "938 862 134",
+                    email: "info@canroca.cat",
+                    web: "www.canroca.cat",
+                    producte1_nom: "Llonganissa de Vic IGP",
+                    producte1_categoria: "Embotits propis",
+                    producte1_preu: "18€/kg",
+                    producte1_descripcio: "Llonganissa artesana amb Indicació Geogràfica Protegida, elaborada segons la recepta tradicional.",
+                    producte2_nom: "Botifarra de perol",
+                    producte2_categoria: "Embotits propis",
+                    producte2_preu: "14€/kg",
+                    producte2_descripcio: "Botifarra cuita al perol seguint la recepta de l'àvia.",
+                    lat: 41.9297,
+                    lng: 2.2544
+                },
+                {
+                    nom: "Formatgeria del Pirineu",
+                    comarca: "Cerdanya",
+                    municipi: "Puigcerdà",
+                    adreca: "Carrer Major, 28, 17520 Puigcerdà",
+                    telefon: "972 880 456",
+                    email: "contacte@formatgeriapirineu.cat",
+                    web: "www.formatgeriapirineu.cat",
+                    producte1_nom: "Formatge de tupí",
+                    producte1_categoria: "Formatges i làctics",
+                    producte1_preu: "22€/kg",
+                    producte1_descripcio: "Formatge fermentat típic de la Cerdanya, elaborat amb llet crua d'ovella.",
+                    producte2_nom: "Mató de muntanya",
+                    producte2_categoria: "Formatges i làctics",
+                    producte2_preu: "8€/unitat",
+                    producte2_descripcio: "Mató fresc elaborat diàriament amb llet de vaca del Pirineu.",
+                    lat: 42.4318,
+                    lng: 1.9286
+                },
+                {
+                    nom: "Celler Vall del Montsant",
+                    comarca: "Priorat",
+                    municipi: "Falset",
+                    adreca: "Avinguda Catalunya, 45, 43730 Falset",
+                    telefon: "977 830 234",
+                    email: "celler@vallmontsant.cat",
+                    web: "www.vallmontsant.cat",
+                    producte1_nom: "Vi negre DO Montsant",
+                    producte1_categoria: "Begudes artesanes (vi, cava, licors, cerveses)",
+                    producte1_preu: "15€/ampolla",
+                    producte1_descripcio: "Vi negre de garnatxa i carinyena amb 12 mesos de criança en bóta de roure.",
+                    producte2_nom: "Oli d'oliva verge extra",
+                    producte2_categoria: "Oli i olives",
+                    producte2_preu: "18€/litre",
+                    producte2_descripcio: "Oli d'arbequina de primera premsada en fred.",
+                    lat: 41.1461,
+                    lng: 0.8256
+                },
+                {
+                    nom: "Forn de Pa Sant Josep",
+                    comarca: "Barcelonès",
+                    municipi: "Barcelona",
+                    adreca: "Carrer de Sants, 123, 08014 Barcelona",
+                    telefon: "934 234 567",
+                    email: "forn@santjosep.cat",
+                    web: "www.fornsantjosep.cat",
+                    producte1_nom: "Pa de pagès",
+                    producte1_categoria: "Pa, pastissos",
+                    producte1_preu: "3.50€/unitat",
+                    producte1_descripcio: "Pa artesà de massa mare amb fermentació lenta de 24 hores.",
+                    producte2_nom: "Coca de Sant Joan",
+                    producte2_categoria: "Pa, pastissos",
+                    producte2_preu: "12€/unitat",
+                    producte2_descripcio: "Coca tradicional catalana amb fruita confitada i pinyons.",
+                    lat: 41.3751,
+                    lng: 2.1401
+                },
+                {
+                    nom: "Marisqueria Costa Brava",
+                    comarca: "Alt Empordà",
+                    municipi: "Roses",
+                    adreca: "Port Pesquer, s/n, 17480 Roses",
+                    telefon: "972 256 789",
+                    email: "info@marisqueriacostabrava.cat",
+                    web: "www.marisqueriacostabrava.cat",
+                    producte1_nom: "Gambes de Roses",
+                    producte1_categoria: "Peix, marisc",
+                    producte1_preu: "45€/kg",
+                    producte1_descripcio: "Gambes vermelles fresques capturades a la badia de Roses.",
+                    producte2_nom: "Anxoves de l'Escala",
+                    producte2_categoria: "Peix, marisc",
+                    producte2_preu: "18€/llauna",
+                    producte2_descripcio: "Anxoves en salaó elaborades artesanalment.",
+                    lat: 42.2639,
+                    lng: 3.1769
+                }
+            ];
+        }
+
+        // Actualitzar filtres
+        function updateFilters() {
+            const comarques = [...new Set(allShops.map(s => s.comarca).filter(Boolean))].sort();
+            const municipis = [...new Set(allShops.map(s => s.municipi).filter(Boolean))].sort();
+            
+            const comarcaFilter = document.getElementById('comarca-filter');
+            comarcaFilter.innerHTML = '<option value="">📍 Totes les comarques</option>';
+            comarques.forEach(comarca => {
+                comarcaFilter.innerHTML += `<option value="${comarca}">${comarca}</option>`;
+            });
+            
+            const municipiFilter = document.getElementById('municipi-filter');
+            municipiFilter.innerHTML = '<option value="">🏘️ Tots els municipis</option>';
+            municipis.forEach(municipi => {
+                municipiFilter.innerHTML += `<option value="${municipi}">${municipi}</option>`;
+            });
+        }
+
+        // Mostrar comerços
+        function displayShops(shops) {
+            const container = document.getElementById('shops-container');
+            
+            if (shops.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <i class="fas fa-search" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--text-light);">No s'han trobat comerços</h3>
+                        <p style="color: var(--text-muted);">Prova amb uns altres criteris de cerca</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = shops.map(shop => createShopCard(shop)).join('');
+        }
+
+        // Crear targeta de comerç
+        function createShopCard(shop) {
+            const categoryIcon = getCategoryIcon(shop.producte1_categoria);
+            
+            return `
+                <div class="commerce-card" onclick="showShopDetails(${allShops.indexOf(shop)})">
+                    <div class="commerce-header">
+                        <h3>${shop.nom}</h3>
+                        <div class="commerce-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}
+                        </div>
+                    </div>
+                    <div class="commerce-body">
+                        ${shop.producte1_nom ? `
+                            <div class="product-showcase">
+                                <h4><i class="${categoryIcon}"></i> ${shop.producte1_nom}</h4>
+                                ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
+                                ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
+                            </div>
+                        ` : ''}
+                        ${shop.producte2_nom ? `
+                            <div class="product-showcase">
+                                <h4><i class="${getCategoryIcon(shop.producte2_categoria)}"></i> ${shop.producte2_nom}</h4>
+                                ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
+                                ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="commerce-footer">
+                        <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
+                        <div class="commerce-actions">
+                            ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
+                            ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
+                            ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Obtenir icona de categoria
+        function getCategoryIcon(category) {
+            return CONFIG.CATEGORY_ICONS[category] || CONFIG.CATEGORY_ICONS.default;
+        }
+
+        // Afegir marcadors al mapa
+        function addMarkersToMap(shops) {
+            // Eliminar marcadors existents
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            shops.forEach(shop => {
+                if (shop.lat && shop.lng) {
+                    const color = CONFIG.MARKER_COLORS[shop.producte1_categoria] || CONFIG.MARKER_COLORS.default;
+                    
+                    const icon = L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    });
+                    
+                    const marker = L.marker([shop.lat, shop.lng], { icon })
+                        .bindPopup(createPopupContent(shop))
+                        .addTo(map);
+                    
+                    markers.push(marker);
+                }
+            });
+            
+            // Ajustar vista del mapa
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // Crear contingut del popup
+        function createPopupContent(shop) {
+            return `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h4>${shop.nom}</h4>
+                        <span class="popup-category">${shop.producte1_categoria || 'Altres'}</span>
+                    </div>
+                    <div class="popup-body">
+                        <p><i class="fas fa-map-marker-alt"></i> ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}</p>
+                        ${shop.producte1_nom ? `
+                            <div class="popup-product">
+                                <strong>${shop.producte1_nom}</strong>
+                                ${shop.producte1_preu ? `<span style="color: var(--accent-color); font-weight: bold;">${shop.producte1_preu}</span>` : ''}
+                            </div>
+                        ` : ''}
+                        ${shop.producte2_nom ? `
+                            <div class="popup-product">
+                                <strong>${shop.producte2_nom}</strong>
+                                ${shop.producte2_preu ? `<span style="color: var(--accent-color); font-weight: bold;">${shop.producte2_preu}</span>` : ''}
+                            </div>
+                        ` : ''}
+                        <div class="popup-actions">
+                            <button class="popup-btn popup-btn-primary" onclick="showShopDetails(${allShops.indexOf(shop)})">
+                                <i class="fas fa-info-circle"></i> Més info
+                            </button>
+                            ${shop.telefon ? `
+                                <button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'">
+                                    <i class="fas fa-phone"></i> Trucar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mostrar detalls del comerç
+        function showShopDetails(index) {
+            const shop = allShops[index];
+            const modal = document.getElementById('shop-modal');
+            const headerContent = document.getElementById('modal-header-content');
+            const bodyContent = document.getElementById('modal-body');
+            
+            headerContent.innerHTML = `
+                <h2>${shop.nom}</h2>
+                <p><i class="fas fa-map-marker-alt"></i> ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}</p>
+            `;
+            
+            bodyContent.innerHTML = `
+                ${shop.adreca ? `<p><strong>Adreça:</strong> ${shop.adreca}</p>` : ''}
+                ${shop.telefon ? `<p><strong>Telèfon:</strong> <a href="tel:${shop.telefon}">${shop.telefon}</a></p>` : ''}
+                ${shop.email ? `<p><strong>Email:</strong> <a href="mailto:${shop.email}">${shop.email}</a></p>` : ''}
+                ${shop.web ? `<p><strong>Web:</strong> <a href="${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}" target="_blank">${shop.web}</a></p>` : ''}
+                
+                <h3 style="margin-top: 2rem; color: var(--primary-color);">Productes destacats</h3>
+                
+                ${shop.producte1_nom ? `
+                    <div class="product-showcase">
+                        <h4><i class="${getCategoryIcon(shop.producte1_categoria)}"></i> ${shop.producte1_nom}</h4>
+                        <p><strong>Categoria:</strong> ${shop.producte1_categoria}</p>
+                        ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
+                        ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
+                    </div>
+                ` : ''}
+                
+                ${shop.producte2_nom ? `
+                    <div class="product-showcase">
+                        <h4><i class="${getCategoryIcon(shop.producte2_categoria)}"></i> ${shop.producte2_nom}</h4>
+                        <p><strong>Categoria:</strong> ${shop.producte2_categoria}</p>
+                        ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
+                        ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        // Aplicar filtres
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedComarca = document.getElementById('comarca-filter').value;
+            const selectedMunicipi = document.getElementById('municipi-filter').value;
+            const selectedCategoria = document.getElementById('categoria-filter').value;
+            
+            filteredShops = allShops.filter(shop => {
+                const matchSearch = !searchTerm || 
+                    shop.nom.toLowerCase().includes(searchTerm) ||
+                    shop.municipi.toLowerCase().includes(searchTerm) ||
+                    shop.producte1_nom.toLowerCase().includes(searchTerm) ||
+                    shop.producte2_nom.toLowerCase().includes(searchTerm);
+                
+                const matchComarca = !selectedComarca || shop.comarca === selectedComarca;
+                const matchMunicipi = !selectedMunicipi || shop.municipi === selectedMunicipi;
+                const matchCategoria = !selectedCategoria || 
+                    shop.producte1_categoria === selectedCategoria ||
+                    shop.producte2_categoria === selectedCategoria;
+                
+                return matchSearch && matchComarca && matchMunicipi && matchCategoria;
+            });
+            
+            displayShops(filteredShops);
+            updateResultsCount();
+        }
+
+        // Aplicar filtres del mapa
+        function applyMapFilters() {
+            const checkedCategories = Array.from(document.querySelectorAll('#categoryFilters input:checked'))
+                .map(input => input.dataset.cat);
+            
+            const filtered = allShops.filter(shop => 
+                checkedCategories.includes(shop.producte1_categoria) ||
+                checkedCategories.includes(shop.producte2_categoria)
+            );
+            
+            addMarkersToMap(filtered);
+        }
+
+        // Actualitzar comptador de resultats
+        function updateResultsCount() {
+            const countElement = document.getElementById('resultsCount');
+            if (countElement) {
+                countElement.textContent = `${filteredShops.length} comerços trobats`;
+            }
+        }
+
+        // Canviar mode de vista
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            const container = document.getElementById('shops-container');
+            const gridBtn = document.querySelector('.view-btn:first-child');
+            const listBtn = document.querySelector('.view-btn:last-child');
+            
+            if (mode === 'grid') {
+                container.className = 'commerce-grid fade-in-stagger';
+                gridBtn.classList.add('active');
+                listBtn.classList.remove('active');
+            } else {
+                container.className = 'commerce-list fade-in-stagger';
+                gridBtn.classList.remove('active');
+                listBtn.classList.add('active');
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Cerca en temps real
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(applyFilters, 300);
+                });
+            }
+            
+            // Filtres
+            document.getElementById('comarca-filter')?.addEventListener('change', applyFilters);
+            document.getElementById('municipi-filter')?.addEventListener('change', applyFilters);
+            document.getElementById('categoria-filter')?.addEventListener('change', applyFilters);
+            
+            // Modal
+            const modal = document.getElementById('shop-modal');
+            const closeBtn = document.querySelector('.close');
+            
+            if (closeBtn) {
+                closeBtn.onclick = function() {
+                    modal.style.display = 'none';
+                }
+            }
+            
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+            
+            // Formulari de registre
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegisterSubmit);
+            }
+        }
+
+        // Gestionar enviament del formulari
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Aquí normalment enviaríem les dades a un servidor
+            console.log('Dades del formulari:', data);
+            
+            // Mostrar missatge d'èxit
+            showSuccessMessage('Sol·licitud enviada correctament! Ens posarem en contacte aviat.');
+            
+            // Netejar formulari
+            e.target.reset();
+            
+            // Tornar a la pàgina d'inici després de 3 segons
+            setTimeout(() => {
+                showTab('inici');
+            }, 3000);
+        }
+
+        // Mostrar missatges
+        function showSuccessMessage(message) {
+            showMessage(message, 'success');
+        }
+
+        function showErrorMessage(message) {
+            showMessage(message, 'error');
+        }
+
+        function showMessage(message, type) {
+            const existingMessage = document.querySelector('.success-message, .error-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Mostrar/amagar spinner de càrrega
+        function showLoadingSpinner() {
+            const container = document.getElementById('shops-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Carregant comerços...
+                    </div>
+                `;
+            }
+        }
+
+        function hideLoadingSpinner() {
+            // El spinner s'elimina automàticament quan es mostren els comerços
         }
