@@ -1024,17 +1024,12 @@
 
         @media (max-width: 968px) {
             .map-container {
-                flex-direction: column;
+                grid-template-columns: 1fr;
             }
             
             .filters-sidebar {
                 position: static;
-                margin-bottom: 1rem;
-            }
-            
-            .category-filters {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 0.5rem;
+                margin-bottom: 2rem;
             }
             
             .commerce-grid {
@@ -1095,7 +1090,7 @@
         </div>
     </header>
 
-// LIMIT ENTRE PART 1 I PART 2 ////////////////////
+// LIMIT ENTRE PART 1 I PART 2
     
     <!-- Tab Content: Inici -->
     <div id="content-inici" class="tab-content active">
