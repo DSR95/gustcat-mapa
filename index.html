@@ -300,20 +300,18 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 2rem;
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
             margin-bottom: 4rem;
         }
 
         .filters-sidebar {
             background: var(--bg-white);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-medium);
-            height: fit-content;
-            position: sticky;
-            top: 120px;
+            width: 100%;
         }
 
         .filter-section {
@@ -331,9 +329,9 @@
         }
 
         .category-filters {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.8rem;
         }
 
         .category-filter {
@@ -382,12 +380,13 @@
         }
 
         #map {
-            height: 700px;
+            height: 800px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-medium);
             background: var(--bg-cream);
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
 
         /* Results Section */
@@ -1025,12 +1024,17 @@
 
         @media (max-width: 968px) {
             .map-container {
-                grid-template-columns: 1fr;
+                flex-direction: column;
             }
             
             .filters-sidebar {
                 position: static;
-                margin-bottom: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .category-filters {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.5rem;
             }
             
             .commerce-grid {
@@ -1090,6 +1094,9 @@
             </nav>
         </div>
     </header>
+
+// LIMIT ENTRE PART 1 I PART 2 ////////////////////
+    
     <!-- Tab Content: Inici -->
     <div id="content-inici" class="tab-content active">
         <!-- Hero Section -->
