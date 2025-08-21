@@ -1497,7 +1497,9 @@
 <!-- PART 3: JAVASCRIPT - CORE & SHOWTAB        -->
 
     
-            // Processar dades de Google Sheets
+
+
+    // Processar dades de Google Sheets
         async function processGoogleSheetsData(data) {
             console.log('Raw Google Sheets data:', data);
             
@@ -1831,8 +1833,8 @@
             
             // Mostrar capçaleres per debug
             if (rows[0] && rows[0].c) {
-                const headers = rows[0].c.map(cell => cell?.v || 'empty');
-                console.log('Sheet headers:', headers);
+                const headers = rows[0].c.map((cell, index) => `${index}: ${cell?.v || 'empty'}`);
+                console.log('Sheet headers with indices:', headers);
             }
             
             for (let i = 1; i < rows.length; i++) {
@@ -1844,58 +1846,87 @@
                     continue;
                 }
                 
-                // Extreure valors de cada columna amb seguretat
-                const nom = row.c[0]?.v?.toString().trim() || '';
-                const categoria = row.c[1]?.v?.toString().trim() || '';
-                const producte1_nom = row.c[2]?.v?.toString().trim() || '';
-                const producte2_nom = row.c[3]?.v?.toString().trim() || '';
-                const descripcio = row.c[4]?.v?.toString().trim() || '';
-                const adreca = row.c[5]?.v?.toString().trim() || '';
-                const codi_postal = row.c[6]?.v?.toString().trim() || '';
-                const municipi = row.c[7]?.v?.toString().trim() || '';
-                const comarca = row.c[8]?.v?.toString().trim() || '';
-                const telefon = row.c[9]?.v?.toString().trim() || '';
+                // Funció auxiliar per llegir cel·les de forma segura
+                const getCellValue = (index) => {
+                    if (row.c[index] && row.c[index].v !== null && row.c[index].v !== undefined) {
+                        return row.c[index].v.toString().trim();
+                    }
+                    return '';
+                };
                 
-                console.log(`Row ${i}:`, {nom, categoria, producte1_nom, municipi});
+                // Extreure valors segons l'ordre real del sheet
+                const nom = getCellValue(0); // A: nom_comerc
+                const logo_comerc = getCellValue(1); // B: logo_comerc
+                const descripcio_comerc = getCellValue(2); // C: descripcio_comerc
+                const producte1_nom = getCellValue(3); // D: producte1_nom
+                const producte1_categoria = getCellValue(4); // E: producte1_categoria (abans "categoria")
+                const producte1_foto = getCellValue(5); // F: producte1_foto
+                const producte1_descripcio = getCellValue(6); // G: producte1_descripcio
+                const producte2_nom = getCellValue(7); // H: producte2_nom
+                const producte2_categoria = getCellValue(8); // I: producte2_categoria (nova)
+                const producte2_foto = getCellValue(9); // J: producte2_foto
+                const producte2_descripcio = getCellValue(10); // K: producte2_descripcio
+                const adreca = getCellValue(11); // L: adreca_comerc
+                const codi_postal = getCellValue(12); // M: codi_postal
+                const municipi = getCellValue(13); // N: municipi
+                const comarca = getCellValue(14); // O: comarca
+                const telefon = getCellValue(15); // P: telefon
+                const email = getCellValue(16); // Q: email
+                const web = getCellValue(17); // R: web
+                const actiu = getCellValue(18); // S: actiu
+                const data_alta = getCellValue(19); // T: data_alta
+                const notes_internes = getCellValue(20); // U: notes_internes
                 
-                // Només afegir si almenys té nom
-                if (nom) {
+                console.log(`Row ${i} - Nom: "${nom}", Actiu: "${actiu}", Cat1: "${producte1_categoria}", Cat2: "${producte2_categoria}"`);
+                
+                // Filtrar només els actius: "Sí" o "En seguiment"
+                const isActive = actiu === 'Sí' || actiu === 'En seguiment';
+                
+                if (nom && isActive) {
                     const shop = {
                         nom: nom,
                         comarca: comarca,
                         municipi: municipi,
                         adreca: adreca,
+                        codi_postal: codi_postal,
                         telefon: telefon,
-                        email: '', // No hi ha columna d'email al teu sheet
-                        web: '', // No hi ha columna de web al teu sheet
+                        email: email,
+                        web: web,
+                        logo_comerc: logo_comerc,
+                        descripcio_comerc: descripcio_comerc,
                         producte1_nom: producte1_nom,
-                        producte1_categoria: categoria,
-                        producte1_preu: '', // No hi ha columna de preu
-                        producte1_descripcio: descripcio,
+                        producte1_categoria: producte1_categoria,
+                        producte1_preu: '',
+                        producte1_descripcio: producte1_descripcio,
+                        producte1_foto: producte1_foto,
                         producte2_nom: producte2_nom,
-                        producte2_categoria: categoria, // Mateix categoria per defecte
+                        producte2_categoria: producte2_categoria,
                         producte2_preu: '',
-                        producte2_descripcio: '',
+                        producte2_descripcio: producte2_descripcio,
+                        producte2_foto: producte2_foto,
+                        actiu: actiu,
+                        data_alta: data_alta,
+                        notes_internes: notes_internes,
                         lat: null,
                         lng: null
                     };
                     
                     // Geocodificar adreça
                     const fullAddress = `${adreca} ${codi_postal} ${municipi}, Catalunya`.trim();
-                    const coords = await geocodeAddress(fullAddress);
+                    const coords = await geocodeAddress(fullAddress || `${municipi}, Catalunya`);
                     if (coords) {
                         shop.lat = coords.lat;
                         shop.lng = coords.lng;
                     }
                     
                     shops.push(shop);
-                    console.log(`Added shop: ${shop.nom}`);
+                    console.log(`✅ Added shop: ${shop.nom} (Status: ${actiu})`);
                 } else {
-                    console.log(`Skipping row ${i} - no name`);
+                    console.log(`❌ Skipped row ${i} - Name: "${nom}", Active: "${actiu}" (not 'Sí' or 'En seguiment')`);
                 }
             }
             
-            console.log(`Total shops processed: ${shops.length}`);
+            console.log(`Total active shops processed: ${shops.length}`);
             return shops;
         }
 
@@ -1931,6 +1962,8 @@
             return randomCoords;
         }
 
+
+    
 
             
                 
