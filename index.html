@@ -1,3 +1,8 @@
+<!-- ============================================ -->
+<!-- PART 1: HTML STRUCTURE + CSS STYLES        -->
+
+
+
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1097,7 +1102,9 @@
         </div>
     </header>
 
-<!-- LIMIT ENTRE PART 1 I PART 2 -->
+<!-- ============================================ -->
+<!-- PART 2: HTML CONTENT (TABS)                -->
+<!-- ============================================ -->
     
     <!-- Tab Content: Inici -->
     <div id="content-inici" class="tab-content active">
@@ -1483,7 +1490,112 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
             crossorigin=""></script>
-            <script>
+
+
+
+<!-- ============================================ -->
+<!-- PART 3: JAVASCRIPT - CORE & SHOWTAB        -->
+
+    
+            // Processar dades de Google Sheets
+        async function processGoogleSheetsData(data) {
+            console.log('Raw Google Sheets data:', data);
+            
+            if (!data.table || !data.table.rows) {
+                throw new Error('Invalid Google Sheets data structure');
+            }
+            
+            const rows = data.table.rows;
+            const shops = [];
+            
+            // Mostrar capçaleres per debug
+            if (rows[0] && rows[0].c) {
+                const headers = rows[0].c.map(cell => cell?.v || 'empty');
+                console.log('Sheet headers:', headers);
+            }
+            
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                
+                // Verificar que la fila té contingut
+                if (!row.c || row.c.length === 0) {
+                    console.log(`Skipping empty row ${i}`);
+                    continue;
+                }
+                
+                // Extreure valors segons l'estructura real del teu sheet
+                const nom = row.c[0]?.v?.toString().trim() || '';
+                const logo_comerc = row.c[1]?.v?.toString().trim() || '';
+                const descripcio_comerc = row.c[2]?.v?.toString().trim() || '';
+                const producte1_nom = row.c[3]?.v?.toString().trim() || '';
+                const categoria = row.c[4]?.v?.toString().trim() || '';
+                const producte1_foto = row.c[5]?.v?.toString().trim() || '';
+                const producte1_descripcio = row.c[6]?.v?.toString().trim() || '';
+                const producte2_nom = row.c[7]?.v?.toString().trim() || '';
+                const categoria2 = row.c[8]?.v?.toString().trim() || '';
+                const producte2_foto = row.c[9]?.v?.toString().trim() || '';
+                const producte2_descripcio = row.c[10]?.v?.toString().trim() || '';
+                const adreca = row.c[11]?.v?.toString().trim() || '';
+                const codi_postal = row.c[12]?.v?.toString().trim() || '';
+                const municipi = row.c[13]?.v?.toString().trim() || '';
+                const comarca = row.c[14]?.v?.toString().trim() || '';
+                const telefon = row.c[15]?.v?.toString().trim() || '';
+                const email = row.c[16]?.v?.toString().trim() || '';
+                const web = row.c[17]?.v?.toString().trim() || '';
+                const actiu = row.c[18]?.v?.toString().trim() || '';
+                const data_alta = row.c[19]?.v?.toString().trim() || '';
+                const notes_internes = row.c[20]?.v?.toString().trim() || '';
+                
+                console.log(`Row ${i}:`, {nom, categoria, producte1_nom, municipi, actiu});
+                
+                // Només afegir si té nom i està actiu
+                if (nom && (actiu === 'TRUE' || actiu === 'true' || actiu === '1' || actiu === 'Sí' || actiu === '' || !actiu)) {
+                    const shop = {
+                        nom: nom,
+                        comarca: comarca,
+                        municipi: municipi,
+                        adreca: adreca,
+                        codi_postal: codi_postal,
+                        telefon: telefon,
+                        email: email,
+                        web: web,
+                        logo_comerc: logo_comerc,
+                        descripcio_comerc: descripcio_comerc,
+                        producte1_nom: producte1_nom,
+                        producte1_categoria: categoria,
+                        producte1_preu: '', // Encara no tens columna de preu
+                        producte1_descripcio: producte1_descripcio,
+                        producte1_foto: producte1_foto,
+                        producte2_nom: producte2_nom,
+                        producte2_categoria: categoria2 || categoria, // Usar categoria2 si existeix
+                        producte2_preu: '',
+                        producte2_descripcio: producte2_descripcio,
+                        producte2_foto: producte2_foto,
+                        actiu: actiu,
+                        data_alta: data_alta,
+                        notes_internes: notes_internes,
+                        lat: null,
+                        lng: null
+                    };
+                    
+                    // Geocodificar adreça
+                    const fullAddress = `${adreca} ${codi_postal} ${municipi}, Catalunya`.trim();
+                    const coords = await geocodeAddress(fullAddress || `${municipi}, Catalunya`);
+                    if (coords) {
+                        shop.lat = coords.lat;
+                        shop.lng = coords.lng;
+                    }
+                    
+                    shops.push(shop);
+                    console.log(`Added shop: ${shop.nom} (Active: ${actiu})`);
+                } else {
+                    console.log(`Skipping row ${i} - Name: "${nom}", Active: "${actiu}"`);
+                }
+            }
+            
+            console.log(`Total shops processed: ${shops.length}`);
+            return shops;
+        }<script>
         // Variables globals
         let map;
         let markers = [];
@@ -1651,14 +1763,33 @@
                 console.log('Loading shops from Google Sheets...');
                 showLoadingSpinner();
                 
-                const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${CONFIG.SHEET_NAME}`;
+                const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}`;
+                console.log('Fetching URL:', url);
                 
                 const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const text = await response.text();
+                console.log('Response text length:', text.length);
+                
+                // Verificar que la resposta sembla JSON de Google
+                if (!text.includes('google.visualization.Query.setResponse')) {
+                    throw new Error('Invalid Google Sheets response format');
+                }
+                
                 const jsonString = text.substring(47).slice(0, -2);
                 const data = JSON.parse(jsonString);
                 
+                console.log('Parsed Google Sheets data successfully');
+                
                 allShops = await processGoogleSheetsData(data);
+                
+                if (allShops.length === 0) {
+                    throw new Error('No valid shops found in spreadsheet');
+                }
+                
                 filteredShops = [...allShops];
                 
                 updateFilters();
@@ -1667,12 +1798,13 @@
                 updateResultsCount();
                 
                 hideLoadingSpinner();
-                showSuccessMessage(`S'han carregat ${allShops.length} comerços correctament`);
+                showSuccessMessage(`S'han carregat ${allShops.length} comerços del Google Sheet`);
                 
             } catch (error) {
-                console.error('Error loading data:', error);
-                console.log('Using sample data instead...');
+                console.error('Error loading Google Sheets data:', error);
+                console.log('Fallback: Using sample data...');
                 
+                // Usar dades de mostra com a fallback
                 allShops = getSampleData();
                 filteredShops = [...allShops];
                 
@@ -1688,44 +1820,82 @@
 
         // Processar dades de Google Sheets
         async function processGoogleSheetsData(data) {
+            console.log('Raw Google Sheets data:', data);
+            
+            if (!data.table || !data.table.rows) {
+                throw new Error('Invalid Google Sheets data structure');
+            }
+            
             const rows = data.table.rows;
             const shops = [];
             
+            // Mostrar capçaleres per debug
+            if (rows[0] && rows[0].c) {
+                const headers = rows[0].c.map(cell => cell?.v || 'empty');
+                console.log('Sheet headers:', headers);
+            }
+            
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
-                if (!row.c || row.c.length < 10) continue;
                 
-                const shop = {
-                    nom: row.c[0]?.v || '',
-                    comarca: row.c[1]?.v || '',
-                    municipi: row.c[2]?.v || '',
-                    adreca: row.c[3]?.v || '',
-                    telefon: row.c[4]?.v || '',
-                    email: row.c[5]?.v || '',
-                    web: row.c[6]?.v || '',
-                    producte1_nom: row.c[7]?.v || '',
-                    producte1_categoria: row.c[8]?.v || '',
-                    producte1_preu: row.c[9]?.v || '',
-                    producte1_descripcio: row.c[10]?.v || '',
-                    producte2_nom: row.c[11]?.v || '',
-                    producte2_categoria: row.c[12]?.v || '',
-                    producte2_preu: row.c[13]?.v || '',
-                    producte2_descripcio: row.c[14]?.v || '',
-                    lat: null,
-                    lng: null
-                };
+                // Verificar que la fila té contingut
+                if (!row.c || row.c.length === 0) {
+                    console.log(`Skipping empty row ${i}`);
+                    continue;
+                }
                 
-                if (shop.nom) {
+                // Extreure valors de cada columna amb seguretat
+                const nom = row.c[0]?.v?.toString().trim() || '';
+                const categoria = row.c[1]?.v?.toString().trim() || '';
+                const producte1_nom = row.c[2]?.v?.toString().trim() || '';
+                const producte2_nom = row.c[3]?.v?.toString().trim() || '';
+                const descripcio = row.c[4]?.v?.toString().trim() || '';
+                const adreca = row.c[5]?.v?.toString().trim() || '';
+                const codi_postal = row.c[6]?.v?.toString().trim() || '';
+                const municipi = row.c[7]?.v?.toString().trim() || '';
+                const comarca = row.c[8]?.v?.toString().trim() || '';
+                const telefon = row.c[9]?.v?.toString().trim() || '';
+                
+                console.log(`Row ${i}:`, {nom, categoria, producte1_nom, municipi});
+                
+                // Només afegir si almenys té nom
+                if (nom) {
+                    const shop = {
+                        nom: nom,
+                        comarca: comarca,
+                        municipi: municipi,
+                        adreca: adreca,
+                        telefon: telefon,
+                        email: '', // No hi ha columna d'email al teu sheet
+                        web: '', // No hi ha columna de web al teu sheet
+                        producte1_nom: producte1_nom,
+                        producte1_categoria: categoria,
+                        producte1_preu: '', // No hi ha columna de preu
+                        producte1_descripcio: descripcio,
+                        producte2_nom: producte2_nom,
+                        producte2_categoria: categoria, // Mateix categoria per defecte
+                        producte2_preu: '',
+                        producte2_descripcio: '',
+                        lat: null,
+                        lng: null
+                    };
+                    
                     // Geocodificar adreça
-                    const coords = await geocodeAddress(shop.adreca || `${shop.municipi}, Catalunya`);
+                    const fullAddress = `${adreca} ${codi_postal} ${municipi}, Catalunya`.trim();
+                    const coords = await geocodeAddress(fullAddress);
                     if (coords) {
                         shop.lat = coords.lat;
                         shop.lng = coords.lng;
                     }
+                    
                     shops.push(shop);
+                    console.log(`Added shop: ${shop.nom}`);
+                } else {
+                    console.log(`Skipping row ${i} - no name`);
                 }
             }
             
+            console.log(`Total shops processed: ${shops.length}`);
             return shops;
         }
 
@@ -1760,6 +1930,16 @@
             geocodeCache.set(address, randomCoords);
             return randomCoords;
         }
+
+
+            
+                
+<!-- ============================================ -->
+<!-- PART 4: JAVASCRIPT - DATA FUNCTIONS        -->
+    
+                
+                
+                
                 // Obtenir dades de mostra
         function getSampleData() {
             return [
@@ -1947,6 +2127,13 @@
         function getCategoryIcon(category) {
             return CONFIG.CATEGORY_ICONS[category] || CONFIG.CATEGORY_ICONS.default;
         }
+                
+                
+<!-- ============================================ -->
+<!-- PART 5: JAVASCRIPT - MAP & FILTERS         -->                
+                
+                
+                
                 // Afegir marcadors al mapa
         function addMarkersToMap(shops) {
             if (!map) {
@@ -2162,6 +2349,17 @@
                 listBtn.classList.add('active');
             }
         }
+
+
+                
+                
+<!-- ============================================ -->
+<!-- PART 6: JAVASCRIPT - EVENTS & UTILITIES    -->                
+                
+                
+                
+                
+                
                 // Configurar event listeners
         function setupEventListeners() {
             console.log('Setting up event listeners...');
