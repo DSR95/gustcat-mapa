@@ -544,11 +544,40 @@
             margin-bottom: 1.5rem;
             border: 2px solid transparent;
             transition: var(--transition);
+            position: relative;
         }
 
         .product-showcase:hover {
             border-color: var(--accent-color);
             background: var(--bg-light);
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+            border: 2px solid var(--border-color);
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--accent-color);
+        }
+
+        .product-info {
+            flex: 1;
         }
 
         .product-showcase h4 {
@@ -704,6 +733,87 @@
 
         .popup-btn-secondary:hover {
             background: var(--bg-cream);
+        }
+
+        /* Image Gallery Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .image-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: zoomIn 0.4s ease;
+        }
+
+        .image-modal img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-modal-close:hover {
+            background: var(--accent-color);
+            transform: rotate(90deg);
+        }
+
+        .image-modal-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
         }
 
         /* Form Sections */
@@ -1031,15 +1141,17 @@
 
         @media (max-width: 968px) {
             .map-container {
-                flex-direction: column;
+                grid-template-columns: 1fr;
             }
             
             .filters-sidebar {
-                position: static;
-                margin-bottom: 1rem;
+                height: auto;
+                margin-bottom: 1.5rem;
+                overflow-y: visible;
             }
             
             .category-filters {
+                display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 gap: 0.5rem;
             }
@@ -1102,9 +1214,15 @@
         </div>
     </header>
 
+
+
+
+
 <!-- ============================================ -->
 <!-- PART 2: HTML CONTENT (TABS)                -->
 <!-- ============================================ -->
+    
+   
     
     <!-- Tab Content: Inici -->
     <div id="content-inici" class="tab-content active">
@@ -1483,6 +1601,15 @@
                 <div id="modal-header-content"></div>
             </div>
             <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Modal per ampliar imatges -->
+    <div id="image-modal" class="image-modal">
+        <span class="image-modal-close">&times;</span>
+        <div class="image-modal-content">
+            <img id="modal-image" src="" alt="">
+            <div class="image-modal-caption" id="modal-caption"></div>
         </div>
     </div>
 
@@ -1972,7 +2099,84 @@
     
                 
                 
-    // Obtenir dades de mostra
+   // Crear targeta de comerç
+        function createShopCard(shop) {
+            const categoryEmoji = getCategoryEmoji(shop.producte1_categoria);
+            
+            return `
+                <div class="commerce-card" onclick="showShopDetails(${allShops.indexOf(shop)})">
+                    <div class="commerce-header">
+                        <h3>${shop.nom}</h3>
+                        <div class="commerce-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}
+                        </div>
+                    </div>
+                    <div class="commerce-body">
+                        ${shop.producte1_nom ? `
+                            <div class="product-showcase">
+                                <div class="product-content">
+                                    ${shop.producte1_foto ? `
+                                        <img src="${shop.producte1_foto}" 
+                                             alt="${shop.producte1_nom}" 
+                                             class="product-image"
+                                             onclick="event.stopPropagation(); openImageModal('${shop.producte1_foto}', '${shop.producte1_nom}')">
+                                    ` : `
+                                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                                            ${categoryEmoji}
+                                        </div>
+                                    `}
+                                    <div class="product-info">
+                                        <h4 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
+                                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
+                                                ${categoryEmoji}
+                                            </span>
+                                            ${shop.producte1_nom}
+                                        </h4>
+                                        ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
+                                        ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${shop.producte2_nom ? `
+                            <div class="product-showcase">
+                                <div class="product-content">
+                                    ${shop.producte2_foto ? `
+                                        <img src="${shop.producte2_foto}" 
+                                             alt="${shop.producte2_nom}" 
+                                             class="product-image"
+                                             onclick="event.stopPropagation(); openImageModal('${shop.producte2_foto}', '${shop.producte2_nom}')">
+                                    ` : `
+                                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                                            ${getCategoryEmoji(shop.producte2_categoria)}
+                                        </div>
+                                    `}
+                                    <div class="product-info">
+                                        <h4 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
+                                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
+                                                ${getCategoryEmoji(shop.producte2_categoria)}
+                                            </span>
+                                            ${shop.producte2_nom}
+                                        </h4>
+                                        ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
+                                        ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="commerce-footer">
+                        <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
+                        <div class="commerce-actions">
+                            ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
+                            ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
+                            ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }// Obtenir dades de mostra
         function getSampleData() {
             return [
                 {
@@ -2184,7 +2388,7 @@
                 'Restauració': '🍽️'
             };
             return categoryEmojis[category] || '🏪';
-        }            
+        }           
 
 
 
@@ -2457,7 +2661,7 @@
                 
                 
                 
-                // Configurar event listeners
+           // Configurar event listeners
         function setupEventListeners() {
             console.log('Setting up event listeners...');
             
@@ -2479,7 +2683,7 @@
             if (municipiFilter) municipiFilter.addEventListener('change', applyFilters);
             if (categoriaFilter) categoriaFilter.addEventListener('change', applyFilters);
             
-            // Modal
+            // Modal de comerç
             const modal = document.getElementById('shop-modal');
             const closeBtn = document.querySelector('.close');
             
@@ -2489,10 +2693,23 @@
                 }
             }
             
-            // Tancar modal fent clic fora
+            // Modal d'imatge
+            const imageModal = document.getElementById('image-modal');
+            const imageCloseBtn = document.querySelector('.image-modal-close');
+            
+            if (imageCloseBtn) {
+                imageCloseBtn.onclick = function() {
+                    imageModal.style.display = 'none';
+                }
+            }
+            
+            // Tancar modals fent clic fora
             window.onclick = function(event) {
                 if (event.target == modal) {
                     modal.style.display = 'none';
+                }
+                if (event.target == imageModal) {
+                    imageModal.style.display = 'none';
                 }
             }
             
@@ -2511,6 +2728,29 @@
             });
             
             console.log('Event listeners set up successfully');
+        }
+
+        // Obrir modal d'imatge
+        function openImageModal(imageSrc, caption) {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            const modalCaption = document.getElementById('modal-caption');
+            
+            if (modal && modalImg && modalCaption) {
+                modal.style.display = 'block';
+                modalImg.src = imageSrc;
+                modalCaption.textContent = caption;
+                
+                // Gestió d'error si la imatge no carrega
+                modalImg.onerror = function() {
+                    modalCaption.textContent = 'Error carregant la imatge';
+                    modalImg.style.display = 'none';
+                };
+                
+                modalImg.onload = function() {
+                    modalImg.style.display = 'block';
+                };
+            }
         }
 
         // Gestionar enviament del formulari
