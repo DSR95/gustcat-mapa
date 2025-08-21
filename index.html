@@ -1972,8 +1972,7 @@
     
                 
                 
-                
-                // Obtenir dades de mostra
+    // Obtenir dades de mostra
         function getSampleData() {
             return [
                 {
@@ -2117,7 +2116,7 @@
 
         // Crear targeta de comerç
         function createShopCard(shop) {
-            const categoryIcon = getCategoryIcon(shop.producte1_categoria);
+            const categoryEmoji = getCategoryEmoji(shop.producte1_categoria);
             
             return `
                 <div class="commerce-card" onclick="showShopDetails(${allShops.indexOf(shop)})">
@@ -2131,14 +2130,24 @@
                     <div class="commerce-body">
                         ${shop.producte1_nom ? `
                             <div class="product-showcase">
-                                <h4><i class="${categoryIcon}"></i> ${shop.producte1_nom}</h4>
+                                <h4 style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <span style="display: inline-block; width: 28px; height: 28px; background: var(--gradient-accent); color: white; border-radius: 6px; text-align: center; line-height: 28px; font-size: 16px;">
+                                        ${categoryEmoji}
+                                    </span>
+                                    ${shop.producte1_nom}
+                                </h4>
                                 ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
                                 ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
                             </div>
                         ` : ''}
                         ${shop.producte2_nom ? `
                             <div class="product-showcase">
-                                <h4><i class="${getCategoryIcon(shop.producte2_categoria)}"></i> ${shop.producte2_nom}</h4>
+                                <h4 style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <span style="display: inline-block; width: 28px; height: 28px; background: var(--gradient-accent); color: white; border-radius: 6px; text-align: center; line-height: 28px; font-size: 16px;">
+                                        ${getCategoryEmoji(shop.producte2_categoria)}
+                                    </span>
+                                    ${shop.producte2_nom}
+                                </h4>
                                 ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
                                 ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
                             </div>
@@ -2156,18 +2165,40 @@
             `;
         }
 
-        // Obtenir icona de categoria
-        function getCategoryIcon(category) {
-            return CONFIG.CATEGORY_ICONS[category] || CONFIG.CATEGORY_ICONS.default;
-        }
+        // Obtenir emoji de categoria
+        function getCategoryEmoji(category) {
+            const categoryEmojis = {
+                'Carn (engreix: xai, vedella, porc, aviram)': '🥩',
+                'Elaboradors alimentaris (cuinats i conserves)': '👨‍🍳',
+                'Embotits propis': '🌭',
+                'Begudes artesanes (vi, cava, licors, cerveses)': '🍷',
+                'Formatges i làctics': '🧀',
+                'Oli i olives': '🫒',
+                'Pa, pastissos': '🥖',
+                'Peix, marisc': '🐟',
+                'Llegums': '🫘',
+                'Pastes, arròs, cereals': '🍝',
+                'Fruita seca': '🥜',
+                'Fruita i verdures fresques': '🍎',
+                'Mel i condiments aromàtics': '🍯',
+                'Restauració': '🍽️'
+            };
+            return categoryEmojis[category] || '🏪';
+        }            
+
+
+
+
+    
                 
                 
 <!-- ============================================ -->
 <!-- PART 5: JAVASCRIPT - MAP & FILTERS         -->                
                 
                 
-                
-                // Afegir marcadors al mapa
+
+
+// Afegir marcadors al mapa
         function addMarkersToMap(shops) {
             if (!map) {
                 console.error('Map not initialized');
@@ -2290,7 +2321,12 @@
                 
                 ${shop.producte1_nom ? `
                     <div class="product-showcase">
-                        <h4><i class="${getCategoryIcon(shop.producte1_categoria)}"></i> ${shop.producte1_nom}</h4>
+                        <h4 style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
+                                ${getCategoryEmoji(shop.producte1_categoria)}
+                            </span>
+                            ${shop.producte1_nom}
+                        </h4>
                         <p><strong>Categoria:</strong> ${shop.producte1_categoria}</p>
                         ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
                         ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
@@ -2299,7 +2335,12 @@
                 
                 ${shop.producte2_nom ? `
                     <div class="product-showcase">
-                        <h4><i class="${getCategoryIcon(shop.producte2_categoria)}"></i> ${shop.producte2_nom}</h4>
+                        <h4 style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
+                                ${getCategoryEmoji(shop.producte2_categoria)}
+                            </span>
+                            ${shop.producte2_nom}
+                        </h4>
                         <p><strong>Categoria:</strong> ${shop.producte2_categoria}</p>
                         ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
                         ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
@@ -2308,6 +2349,27 @@
             `;
             
             modal.style.display = 'block';
+        }
+
+        // Nova funció per obtenir emoji de categoria
+        function getCategoryEmoji(category) {
+            const categoryEmojis = {
+                'Carn (engreix: xai, vedella, porc, aviram)': '🥩',
+                'Elaboradors alimentaris (cuinats i conserves)': '👨‍🍳',
+                'Embotits propis': '🌭',
+                'Begudes artesanes (vi, cava, licors, cerveses)': '🍷',
+                'Formatges i làctics': '🧀',
+                'Oli i olives': '🫒',
+                'Pa, pastissos': '🥖',
+                'Peix, marisc': '🐟',
+                'Llegums': '🫘',
+                'Pastes, arròs, cereals': '🍝',
+                'Fruita seca': '🥜',
+                'Fruita i verdures fresques': '🍎',
+                'Mel i condiments aromàtics': '🍯',
+                'Restauració': '🍽️'
+            };
+            return categoryEmojis[category] || '🏪';
         }
 
         // Aplicar filtres
@@ -2383,6 +2445,8 @@
             }
         }
 
+    
+              
 
                 
                 
