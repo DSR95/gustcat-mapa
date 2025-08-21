@@ -1947,6 +1947,30 @@
             }
         }
 
+        // Funció per convertir enllaços de Google Drive al format correcte
+        function convertGoogleDriveUrl(url) {
+            if (!url) return '';
+            
+            // Si ja és del format correcte, retornar tal com està
+            if (url.includes('drive.google.com/uc?id=')) {
+                return url;
+            }
+            
+            // Convertir enllaç de compartir a enllaç directe
+            if (url.includes('drive.google.com/file/d/')) {
+                const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (match) {
+                    const fileId = match[1];
+                    const directUrl = `https://drive.google.com/uc?id=${fileId}`;
+                    console.log(`Converted Google Drive URL: ${url} → ${directUrl}`);
+                    return directUrl;
+                }
+            }
+            
+            // Si és un altre tipus d'URL (Imgur, etc.), retornar tal com està
+            return url;
+        }
+
         // Processar dades de Google Sheets
         async function processGoogleSheetsData(data) {
             console.log('Raw Google Sheets data:', data);
@@ -1986,12 +2010,12 @@
                 const logo_comerc = getCellValue(1); // B: logo_comerc
                 const descripcio_comerc = getCellValue(2); // C: descripcio_comerc
                 const producte1_nom = getCellValue(3); // D: producte1_nom
-                const producte1_categoria = getCellValue(4); // E: producte1_categoria (abans "categoria")
-                const producte1_foto = getCellValue(5); // F: producte1_foto
+                const producte1_categoria = getCellValue(4); // E: producte1_categoria
+                const producte1_foto_raw = getCellValue(5); // F: producte1_foto
                 const producte1_descripcio = getCellValue(6); // G: producte1_descripcio
                 const producte2_nom = getCellValue(7); // H: producte2_nom
-                const producte2_categoria = getCellValue(8); // I: producte2_categoria (nova)
-                const producte2_foto = getCellValue(9); // J: producte2_foto
+                const producte2_categoria = getCellValue(8); // I: producte2_categoria
+                const producte2_foto_raw = getCellValue(9); // J: producte2_foto
                 const producte2_descripcio = getCellValue(10); // K: producte2_descripcio
                 const adreca = getCellValue(11); // L: adreca_comerc
                 const codi_postal = getCellValue(12); // M: codi_postal
@@ -2004,7 +2028,14 @@
                 const data_alta = getCellValue(19); // T: data_alta
                 const notes_internes = getCellValue(20); // U: notes_internes
                 
+                // Convertir URLs de Google Drive
+                const producte1_foto = convertGoogleDriveUrl(producte1_foto_raw);
+                const producte2_foto = convertGoogleDriveUrl(producte2_foto_raw);
+                
                 console.log(`Row ${i} - Nom: "${nom}", Actiu: "${actiu}", Cat1: "${producte1_categoria}", Cat2: "${producte2_categoria}"`);
+                if (producte1_foto_raw && producte1_foto_raw !== producte1_foto) {
+                    console.log(`  → Converted photo URL: ${producte1_foto}`);
+                }
                 
                 // Filtrar només els actius: "Sí" o "En seguiment"
                 const isActive = actiu === 'Sí' || actiu === 'En seguiment';
