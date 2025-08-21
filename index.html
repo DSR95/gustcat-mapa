@@ -2134,8 +2134,7 @@
 <!-- PART 4: JAVASCRIPT - DATA FUNCTIONS        -->
     
                 
-                
-   // Crear targeta de comerç
+ // Crear targeta de comerç
         function createShopCard(shop) {
             const categoryEmoji = getCategoryEmoji(shop.producte1_categoria);
             
@@ -2375,22 +2374,7 @@
                     <div class="commerce-body">
                         ${shop.producte1_nom ? `
                             <div class="product-showcase">
-                                <div class="product-content">
-                                    ${shop.producte1_foto ? `
-                                        <img src="${shop.producte1_foto}" 
-                                             alt="${shop.producte1_nom}" 
-                                             class="product-image"
-                                             onclick="event.stopPropagation(); openImageModal('${shop.producte1_foto}', '${shop.producte1_nom}')"
-                                             onerror="console.log('Error loading image: ${shop.producte1_foto}'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                             onload="console.log('Image loaded successfully: ${shop.producte1_foto}')">
-                                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 8px; display: none; align-items: center; justify-content: center; font-size: 2rem;">
-                                            ${categoryEmoji}
-                                        </div>
-                                    ` : `
-                                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-                                            ${categoryEmoji}
-                                        </div>
-                                    `}
+                                <div class="product-content${!shop.producte1_foto ? ' no-image' : ''}">
                                     <div class="product-info">
                                         <h4 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
                                             <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
@@ -2401,27 +2385,20 @@
                                         ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
                                         ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
                                     </div>
+                                    ${shop.producte1_foto ? `
+                                        <img src="${shop.producte1_foto}" 
+                                             alt="${shop.producte1_nom}" 
+                                             class="product-image"
+                                             onclick="event.stopPropagation(); openImageModal('${shop.producte1_foto}', '${shop.producte1_nom}')"
+                                             onerror="console.log('Error loading image: ${shop.producte1_foto}'); this.style.display='none'; this.parentElement.classList.add('no-image');"
+                                             onload="console.log('Image loaded successfully: ${shop.producte1_foto}')">
+                                    ` : ''}
                                 </div>
                             </div>
                         ` : ''}
                         ${shop.producte2_nom ? `
                             <div class="product-showcase">
-                                <div class="product-content">
-                                    ${shop.producte2_foto ? `
-                                        <img src="${shop.producte2_foto}" 
-                                             alt="${shop.producte2_nom}" 
-                                             class="product-image"
-                                             onclick="event.stopPropagation(); openImageModal('${shop.producte2_foto}', '${shop.producte2_nom}')"
-                                             onerror="console.log('Error loading image: ${shop.producte2_foto}'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                             onload="console.log('Image loaded successfully: ${shop.producte2_foto}')">
-                                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 8px; display: none; align-items: center; justify-content: center; font-size: 2rem;">
-                                            ${getCategoryEmoji(shop.producte2_categoria)}
-                                        </div>
-                                    ` : `
-                                        <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-                                            ${getCategoryEmoji(shop.producte2_categoria)}
-                                        </div>
-                                    `}
+                                <div class="product-content${!shop.producte2_foto ? ' no-image' : ''}">
                                     <div class="product-info">
                                         <h4 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
                                             <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
@@ -2432,6 +2409,14 @@
                                         ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
                                         ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
                                     </div>
+                                    ${shop.producte2_foto ? `
+                                        <img src="${shop.producte2_foto}" 
+                                             alt="${shop.producte2_nom}" 
+                                             class="product-image"
+                                             onclick="event.stopPropagation(); openImageModal('${shop.producte2_foto}', '${shop.producte2_nom}')"
+                                             onerror="console.log('Error loading image: ${shop.producte2_foto}'); this.style.display='none'; this.parentElement.classList.add('no-image');"
+                                             onload="console.log('Image loaded successfully: ${shop.producte2_foto}')">
+                                    ` : ''}
                                 </div>
                             </div>
                         ` : ''}
@@ -2467,7 +2452,8 @@
                 'Restauració': '🍽️'
             };
             return categoryEmojis[category] || '🏪';
-        }         
+        }               
+     
 
 
 
