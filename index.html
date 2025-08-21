@@ -1231,7 +1231,7 @@
     
    
     
-    <!-- Tab Content: Inici -->
+   <!-- Tab Content: Inici -->
     <div id="content-inici" class="tab-content active">
         <!-- Hero Section -->
         <section class="hero">
@@ -2740,7 +2740,7 @@
                 
                 
                 
-           // Configurar event listeners
+// Configurar event listeners
         function setupEventListeners() {
             console.log('Setting up event listeners...');
             
@@ -2937,27 +2937,29 @@
         window.addEventListener('load', function() {
             console.log('Page fully loaded');
             
-            // Verificar que tot estigui funcionant
+            // NO executar fallback automàtic - només si realment no hi ha dades
             setTimeout(() => {
                 if (!map) {
                     console.warn('Map still not initialized, retrying...');
                     initMap();
                 }
                 
+                // NOMÉS carregar dades de mostra si NO s'han carregat dades reals
                 if (allShops.length === 0) {
-                    console.warn('No shops loaded, loading sample data...');
+                    console.warn('No shops loaded from Google Sheets, loading sample data...');
                     allShops = getSampleData();
                     filteredShops = [...allShops];
                     updateFilters();
                     displayShops(filteredShops);
                     addMarkersToMap(filteredShops);
                     updateResultsCount();
+                } else {
+                    console.log(`Real data already loaded: ${allShops.length} shops`);
                 }
-            }, 2000);
+            }, 3000); // Més temps perquè Google Sheets carregui
         });
 
     </script>
 </body>
-</html>
-                
+</html>    
                 
