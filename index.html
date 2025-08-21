@@ -2355,8 +2355,6 @@
 
         // Crear targeta de comerç
         function createShopCard(shop) {
-            const categoryEmoji = getCategoryEmoji(shop.producte1_categoria);
-            
             // Debug de fotos
             if (shop.producte1_foto) {
                 console.log(`Shop ${shop.nom} - Photo URL: ${shop.producte1_foto}`);
@@ -2376,10 +2374,7 @@
                             <div class="product-showcase">
                                 <div class="product-content${!shop.producte1_foto ? ' no-image' : ''}">
                                     <div class="product-info">
-                                        <h4 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
-                                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
-                                                ${categoryEmoji}
-                                            </span>
+                                        <h4 style="margin-bottom: 0.8rem; color: var(--primary-color); font-weight: 600;">
                                             ${shop.producte1_nom}
                                         </h4>
                                         ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
@@ -2400,10 +2395,7 @@
                             <div class="product-showcase">
                                 <div class="product-content${!shop.producte2_foto ? ' no-image' : ''}">
                                     <div class="product-info">
-                                        <h4 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
-                                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
-                                                ${getCategoryEmoji(shop.producte2_categoria)}
-                                            </span>
+                                        <h4 style="margin-bottom: 0.8rem; color: var(--primary-color); font-weight: 600;">
                                             ${shop.producte2_nom}
                                         </h4>
                                         ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
@@ -2452,7 +2444,7 @@
                 'Restauració': '🍽️'
             };
             return categoryEmojis[category] || '🏪';
-        }               
+        }     
      
 
 
@@ -2581,38 +2573,58 @@
             `;
             
             bodyContent.innerHTML = `
-                ${shop.adreca ? `<p><strong>Adreça:</strong> ${shop.adreca}</p>` : ''}
-                ${shop.telefon ? `<p><strong>Telèfon:</strong> <a href="tel:${shop.telefon}">${shop.telefon}</a></p>` : ''}
-                ${shop.email ? `<p><strong>Email:</strong> <a href="mailto:${shop.email}">${shop.email}</a></p>` : ''}
-                ${shop.web ? `<p><strong>Web:</strong> <a href="${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}" target="_blank">${shop.web}</a></p>` : ''}
+                <div style="margin-bottom: 2rem;">
+                    ${shop.adreca ? `<p><strong>Adreça:</strong> ${shop.adreca}</p>` : ''}
+                    ${shop.telefon ? `<p><strong>Telèfon:</strong> <a href="tel:${shop.telefon}" style="color: var(--accent-color); text-decoration: none;">${shop.telefon}</a></p>` : ''}
+                    ${shop.email ? `<p><strong>Email:</strong> <a href="mailto:${shop.email}" style="color: var(--accent-color); text-decoration: none;">${shop.email}</a></p>` : ''}
+                    ${shop.web ? `<p><strong>Web:</strong> <a href="${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}" target="_blank" style="color: var(--accent-color); text-decoration: none;">${shop.web}</a></p>` : ''}
+                </div>
                 
-                <h3 style="margin-top: 2rem; color: var(--primary-color);">Productes destacats</h3>
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Productes destacats</h3>
                 
                 ${shop.producte1_nom ? `
-                    <div class="product-showcase">
-                        <h4 style="display: flex; align-items: center; gap: 0.6rem;">
-                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
-                                ${getCategoryEmoji(shop.producte1_categoria)}
-                            </span>
-                            ${shop.producte1_nom}
-                        </h4>
-                        <p><strong>Categoria:</strong> ${shop.producte1_categoria}</p>
-                        ${shop.producte1_descripcio ? `<p>${shop.producte1_descripcio}</p>` : ''}
-                        ${shop.producte1_preu ? `<span class="product-price">${shop.producte1_preu}</span>` : ''}
+                    <div class="product-showcase" style="margin-bottom: 2rem;">
+                        <div class="product-content${!shop.producte1_foto ? ' no-image' : ''}">
+                            <div class="product-info">
+                                <h4 style="margin-bottom: 1rem; color: var(--primary-color); font-size: 1.3rem; font-weight: 600;">
+                                    ${shop.producte1_nom}
+                                </h4>
+                                <p style="margin-bottom: 0.8rem;"><strong>Categoria:</strong> <span style="color: var(--accent-color);">${shop.producte1_categoria}</span></p>
+                                ${shop.producte1_descripcio ? `<p style="color: var(--text-light); line-height: 1.6;">${shop.producte1_descripcio}</p>` : ''}
+                                ${shop.producte1_preu ? `<span class="product-price" style="margin-top: 1rem; display: inline-block;">${shop.producte1_preu}</span>` : ''}
+                            </div>
+                            ${shop.producte1_foto ? `
+                                <img src="${shop.producte1_foto}" 
+                                     alt="${shop.producte1_nom}" 
+                                     style="width: 140px; height: 105px; border-radius: 10px; object-fit: cover; cursor: pointer; box-shadow: var(--shadow-medium); border: 2px solid white; transition: var(--transition);"
+                                     onclick="openImageModal('${shop.producte1_foto}', '${shop.producte1_nom}')"
+                                     onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='var(--shadow-heavy)';"
+                                     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='var(--shadow-medium)';">
+                            ` : ''}
+                        </div>
                     </div>
                 ` : ''}
                 
                 ${shop.producte2_nom ? `
                     <div class="product-showcase">
-                        <h4 style="display: flex; align-items: center; gap: 0.6rem;">
-                            <span style="display: inline-block; width: 24px; height: 24px; background: var(--gradient-accent); color: white; border-radius: 4px; text-align: center; line-height: 24px; font-size: 14px;">
-                                ${getCategoryEmoji(shop.producte2_categoria)}
-                            </span>
-                            ${shop.producte2_nom}
-                        </h4>
-                        <p><strong>Categoria:</strong> ${shop.producte2_categoria}</p>
-                        ${shop.producte2_descripcio ? `<p>${shop.producte2_descripcio}</p>` : ''}
-                        ${shop.producte2_preu ? `<span class="product-price">${shop.producte2_preu}</span>` : ''}
+                        <div class="product-content${!shop.producte2_foto ? ' no-image' : ''}">
+                            <div class="product-info">
+                                <h4 style="margin-bottom: 1rem; color: var(--primary-color); font-size: 1.3rem; font-weight: 600;">
+                                    ${shop.producte2_nom}
+                                </h4>
+                                <p style="margin-bottom: 0.8rem;"><strong>Categoria:</strong> <span style="color: var(--accent-color);">${shop.producte2_categoria}</span></p>
+                                ${shop.producte2_descripcio ? `<p style="color: var(--text-light); line-height: 1.6;">${shop.producte2_descripcio}</p>` : ''}
+                                ${shop.producte2_preu ? `<span class="product-price" style="margin-top: 1rem; display: inline-block;">${shop.producte2_preu}</span>` : ''}
+                            </div>
+                            ${shop.producte2_foto ? `
+                                <img src="${shop.producte2_foto}" 
+                                     alt="${shop.producte2_nom}" 
+                                     style="width: 140px; height: 105px; border-radius: 10px; object-fit: cover; cursor: pointer; box-shadow: var(--shadow-medium); border: 2px solid white; transition: var(--transition);"
+                                     onclick="openImageModal('${shop.producte2_foto}', '${shop.producte2_nom}')"
+                                     onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='var(--shadow-heavy)';"
+                                     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='var(--shadow-medium)';">
+                            ` : ''}
+                        </div>
                     </div>
                 ` : ''}
             `;
