@@ -57,16 +57,17 @@
 
         <!-- Search Section -->
         <section class="search-section">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="🔍 Cerca per nom, producte o municipi..." id="searchInput">
-                <select id="comarca-filter">
-                    <option value="">📍 Totes les comarques</option>
-                </select>
-                <select id="municipi-filter">
-                    <option value="">🏘️ Tots els municipis</option>
-                </select>
-                <select id="categoria-filter">
-    <option value="">🏷️ Totes les categories</option>
+ 
+        <div class="search-container">
+    <input type="text" class="search-input" placeholder="🔍 Cerca per nom, producte o municipi..." id="searchInput">
+    <select id="comarca-filter">
+        <option value="">📍 Totes les comarques</option>
+    </select>
+    <select id="municipi-filter">
+        <option value="">🏘️ Tots els municipis</option>
+    </select>
+    <select id="categoria-filter">
+        <option value="">🏷 Totes les categories</option>
     <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Carn (engreix: xai, vedella, porc, aviram)</option>
     <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris (cuinats i conserves)</option>
     <option value="Embotits propis">🥓 Embotits propis</option>
@@ -80,12 +81,17 @@
     <option value="Fruita seca">🥜 Fruita seca</option>
     <option value="Fruita i verdures fresques">🍎 Fruita i verdures fresques</option>
     <option value="Mel i condiments aromàtics">🍯 Mel i condiments aromàtics</option>
-    <option value="Restauració">🍽️ Restauració</option>
-</select>
-                <button class="btn-primary" onclick="applyFilters()">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+    <option value="Restauració">🍽 Restauració</option
+    </select>
+</div>
+<div class="search-actions">
+    <button class="btn-primary" onclick="applyFilters()">
+        <i class="fas fa-search"></i>
+    </button>
+</div>    
+            
+       
+        
         </section>
 
         <!-- Results Section -->
