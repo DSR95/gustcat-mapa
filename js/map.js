@@ -121,15 +121,20 @@ function showShopDetails(index) {
         console.error('Modal elements not found');
         return;
     }
-    
-    headerContent.innerHTML = `
-        <h2>${shop.nom}</h2>
-        <p><i class="fas fa-map-marker-alt"></i> ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}</p>
-    `;
+   headerContent.innerHTML = `
+    <h2>${shop.nom}</h2>
+    ${shop.descripcio_comerc ? `
+        <p style="margin-top: 1rem; font-size: 1.1rem; opacity: 0.9; font-style: italic;">
+            ${shop.descripcio_comerc}
+        </p>
+    ` : ''}
+    <p style="margin-top: 1.5rem;"><i class="fas fa-map-marker-alt"></i> ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}</p>
+`; 
+
     
     bodyContent.innerHTML = `
-        <div style="margin-bottom: 2rem;">
-            ${shop.adreca ? `<p><strong>Adreça:</strong> ${shop.adreca}</p>` : ''}
+    <div style="margin-bottom: 2rem;">
+            ${shop.adreca || shop.municipi ? `<p><strong>Adreça:</strong> ${(shop.adreca || '') + ' ' + (shop.municipi || '') + (shop.comarca ? ', ' + shop.comarca : '')}</p>` : ''}
             ${shop.telefon ? `<p><strong>Telèfon:</strong> <a href="tel:${shop.telefon}" style="color: var(--accent-color); text-decoration: none;">${shop.telefon}</a></p>` : ''}
             ${shop.email ? `<p><strong>Email:</strong> <a href="mailto:${shop.email}" style="color: var(--accent-color); text-decoration: none;">${shop.email}</a></p>` : ''}
             ${shop.web ? `<p><strong>Web:</strong> <a href="${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}" target="_blank" style="color: var(--accent-color); text-decoration: none;">${shop.web}</a></p>` : ''}
