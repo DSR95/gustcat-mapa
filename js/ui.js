@@ -63,10 +63,8 @@ function createShopCard(shop) {
             
             
 <div class="commerce-footer">
-    <div class="commerce-category-row">
-        <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
-    </div>
-    <div class="commerce-actions-row">
+    <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
+    <div class="commerce-actions">
         ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
         ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
         ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
