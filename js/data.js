@@ -68,12 +68,18 @@ async function processGoogleSheetsData(data) {
     const rows = data.table.rows;
     const shops = [];
     
-    if (rows[0] && rows[0].c) {
-        const headers = rows[0].c.map((cell, index) => `${index}: ${cell?.v || 'empty'}`);
-        console.log('Sheet headers with indices:', headers);
-    }
+if (rows[0] && rows[0].c) {
+    const headers = rows[0].c.map((cell, index) => `${index}: ${cell?.v || 'empty'}`);
+    console.log('Sheet headers with indices:', headers);
+}
+
+// Debug fila 1 (primera fila de dades)
+if (rows[1] && rows[1].c) {
+    const firstRow = rows[1].c.map((cell, index) => `${index}: ${cell?.v || 'empty'}`);
+    console.log('First data row:', firstRow);
+}
     
-    for (let i = 1; i < rows.length; i++) {
+    for (let i = 2; i < rows.length; i++) {
         const row = rows[i];
         
         if (!row.c || row.c.length === 0) {
