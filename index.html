@@ -66,22 +66,22 @@
                     <option value="">🏘️ Tots els municipis</option>
                 </select>
                 <select id="categoria-filter">
-                    <option value="">🏷️ Totes les categories</option>
-                    <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Aviram i ous</option>
-                    <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris</option>
-                    <option value="Embotits propis">🥓 Carn i embotits</option>
-                    <option value="Begudes artesanes (vi, cava, licors, cerveses)">🍷 Begudes artesanes</option>
-                    <option value="Formatges i làctics">🧀 Formatges i làctics</option>
-                    <option value="Oli i olives">🫒 Oli i olives</option>
-                    <option value="Pa, pastissos">🍞 Pa i pastissos</option>
-                    <option value="Peix, marisc">🐟 Peix i marisc</option>
-                    <option value="Llegums">🌾 Llegums</option>
-                    <option value="Pastes, arròs, cereals">🌾 Pastes, arròs, cereals</option>
-                    <option value="Fruita seca">🥜 Fruita seca</option>
-                    <option value="Fruita i verdures fresques">🍎 Fruita i verdures fresques</option>
-                    <option value="Mel i condiments aromàtics">🍯 Mel i condiments aromàtics</option>
-                    <option value="Restauració">🍽️ Restauració</option>
-                </select>
+    <option value="">🏷️ Totes les categories</option>
+    <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Carn (engreix: xai, vedella, porc, aviram)</option>
+    <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris (cuinats i conserves)</option>
+    <option value="Embotits propis">🥓 Embotits propis</option>
+    <option value="Begudes artesanes (vi, cava, licors, cerveses)">🍷 Begudes artesanes (vi, cava, licors, cerveses)</option>
+    <option value="Formatges i làctics">🧀 Formatges i làctics</option>
+    <option value="Oli i olives">🫒 Oli i olives</option>
+    <option value="Pa, pastissos">🍞 Pa, pastissos</option>
+    <option value="Peix, marisc">🐟 Peix, marisc</option>
+    <option value="Llegums">🌾 Llegums</option>
+    <option value="Pastes, arròs, cereals">🌾 Pastes, arròs, cereals</option>
+    <option value="Fruita seca">🥜 Fruita seca</option>
+    <option value="Fruita i verdures fresques">🍎 Fruita i verdures fresques</option>
+    <option value="Mel i condiments aromàtics">🍯 Mel i condiments aromàtics</option>
+    <option value="Restauració">🍽️ Restauració</option>
+</select>
                 <button class="btn-primary" onclick="applyFilters()">
                     <i class="fas fa-search"></i>
                 </button>
@@ -126,28 +126,28 @@
                             <input type="checkbox" id="cat-carn" data-cat="Carn (engreix: xai, vedella, porc, aviram)" checked>
                             <label for="cat-carn">
                                 <div class="category-icon" style="background: #B8860B;">🐄</div>
-                                Aviram i ous
+                                Carn (engreix: xai, vedella, porc, aviram)
                             </label>
                         </div>
                         <div class="category-filter">
                             <input type="checkbox" id="cat-elaboradors" data-cat="Elaboradors alimentaris (cuinats i conserves)" checked>
                             <label for="cat-elaboradors">
                                 <div class="category-icon" style="background: #CD853F;">🥫</div>
-                                Elaboradors
+                                Elaboradors alimentaris (cuinats i conserves)
                             </label>
                         </div>
                         <div class="category-filter">
                             <input type="checkbox" id="cat-embotits" data-cat="Embotits propis" checked>
                             <label for="cat-embotits">
                                 <div class="category-icon" style="background: #A0522D;">🥓</div>
-                                Carn i embotits
+                                Embotits propis
                             </label>
                         </div>
                         <div class="category-filter">
                             <input type="checkbox" id="cat-begudes" data-cat="Begudes artesanes (vi, cava, licors, cerveses)" checked>
                             <label for="cat-begudes">
                                 <div class="category-icon" style="background: #8B008B;">🍷</div>
-                                Begudes
+                                Begudes artesanes (vi, cava, licors, cerveses)
                             </label>
                         </div>
                         <div class="category-filter">
@@ -189,7 +189,7 @@
                             <input type="checkbox" id="cat-pastes" data-cat="Pastes, arròs, cereals" checked>
                             <label for="cat-pastes">
                                 <div class="category-icon" style="background: #F4A460;">🌾</div>
-                                Pastes i cereals
+                                Pastes, arròs i cereals
                             </label>
                         </div>
                         <div class="category-filter">
@@ -203,14 +203,14 @@
                             <input type="checkbox" id="cat-fruita-fresca" data-cat="Fruita i verdures fresques" checked>
                             <label for="cat-fruita-fresca">
                                 <div class="category-icon" style="background: #32CD32;">🍎</div>
-                                Fruita i verdures
+                                Fruita i verdures fresques
                             </label>
                         </div>
                         <div class="category-filter">
                             <input type="checkbox" id="cat-mel" data-cat="Mel i condiments aromàtics" checked>
                             <label for="cat-mel">
                                 <div class="category-icon" style="background: #DAA520;">🍯</div>
-                                Mel i condiments
+                                Mel i condiments aromàtics
                             </label>
                         </div>
                         <div class="category-filter">
@@ -280,10 +280,10 @@
                             <label for="f_p1_cat">Categoria *</label>
                             <select id="f_p1_cat" name="producte1_categoria" required>
                                 <option value="">Selecciona una categoria</option>
-                                <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Aviram i ous</option>
-                                <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris</option>
-                                <option value="Embotits propis">🥓 Carn i embotits</option>
-                                <option value="Begudes artesanes (vi, cava, licors, cerveses)">🍷 Begudes artesanes</option>
+                                <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Carn (engreix: xai, vedella, porc, aviram)</option>
+                                <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris (cuinats i conserves) </option>
+                                <option value="Embotits propis">🥓 Embotits propis</option>
+                                <option value="Begudes artesanes (vi, cava, licors, cerveses)">🍷Begudes artesanes (vi, cava, licors, cerveses)</option>
                                 <option value="Formatges i làctics">🧀 Formatges i làctics</option>
                                 <option value="Oli i olives">🫒 Oli i olives</option>
                                 <option value="Pa, pastissos">🍞 Pa i pastissos</option>
@@ -316,10 +316,10 @@
                             <label for="f_p2_cat">Categoria</label>
                             <select id="f_p2_cat" name="producte2_categoria">
                                 <option value="">Selecciona una categoria</option>
-                                <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Aviram i ous</option>
-                                <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris</option>
-                                <option value="Embotits propis">🥓 Carn i embotits</option>
-                                <option value="Begudes artesanes (vi, cava, licors, cerveses)">🍷 Begudes artesanes</option>
+                                <option value="Carn (engreix: xai, vedella, porc, aviram)">🐄 Carn (engreix: xai, vedella, porc, aviram)</option>
+                                <option value="Elaboradors alimentaris (cuinats i conserves)">🥫 Elaboradors alimentaris (cuinats i conserves)</option>
+                                <option value="Embotits propis">🥓 Embotits propis</option>
+                                <option value="Begudes artesanes (vi, cava, licors, cerveses)">🍷 Begudes artesanes (vi, cava, licors, cerveses)</option>
                                 <option value="Formatges i làctics">🧀 Formatges i làctics</option>
                                 <option value="Oli i olives">🫒 Oli i olives</option>
                                 <option value="Pa, pastissos">🍞 Pa i pastissos</option>
