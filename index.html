@@ -1204,8 +1204,12 @@
         <div class="header-content">
             <a href="#" class="logo" onclick="showTab('inici')">
                 <div class="logo-icon">
-                    <i class="fas fa-utensils"></i>
-                </div>
+    <img src="https://i.imgur.com/pz2v1rp.jpg" 
+         alt="GustCat Logo" 
+         style="width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));"
+         onerror="console.error('❌ LOGO ERROR'); this.outerHTML='<i class=\'fas fa-utensils\' style=\'color: white; font-size: 1.5rem;\'></i>';"
+         onload="console.log('✅ LOGO LOADED');">
+</div>
                 GustCat
             </a>
             <nav>
