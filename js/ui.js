@@ -4,10 +4,17 @@ function createShopCard(shop) {
         <div class="commerce-card" onclick="showShopDetails(${allShops.indexOf(shop)})">
             <div class="commerce-header">
                 <h3>${shop.nom}</h3>
-                <div class="commerce-location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}
-                </div>
+<div class="commerce-location">
+    <i class="fas fa-map-marker-alt"></i>
+    ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}
+</div>
+${shop.descripcio_comerc ? `
+    <p style="margin-top: 1rem; font-size: 0.95rem; opacity: 0.9; font-style: italic;">
+        ${shop.descripcio_comerc}
+    </p>
+` : ''}
+
+
             </div>
             <div class="commerce-body">
                 <div class="products-container">
