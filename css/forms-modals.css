@@ -103,6 +103,8 @@ select:focus {
     display: flex;
     flex-direction: column;
     min-height: 400px;
+    margin-bottom: 0;
+}
 }
 
 .commerce-card::before {
@@ -164,6 +166,11 @@ select:focus {
     flex: 1;
     display: flex;
     flex-direction: column;
+    margin-top: -10px; /* Per solapar amb el header */
+    background: var(--bg-white);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    position: relative;
+    z-index: 2;
 }
 
 .products-container {
@@ -178,6 +185,8 @@ select:focus {
     align-items: center;
     border-top: 1px solid var(--border-color);
     margin-top: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .commerce-category {
