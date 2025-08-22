@@ -53,9 +53,15 @@
 
 .search-container {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 1rem;
     align-items: center;
+}
+
+.search-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
 }
 
 .search-input {
@@ -180,13 +186,22 @@ select:focus {
 .commerce-footer {
     padding: 1.5rem 2rem;
     background: var(--bg-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     border-top: 1px solid var(--border-color);
     margin-top: auto;
     position: relative;
     z-index: 1;
+}
+
+.commerce-category-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.commerce-actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .commerce-category {
