@@ -79,7 +79,7 @@ if (rows[1] && rows[1].c) {
     console.log('First data row:', firstRow);
 }
     
-    for (let i = 2; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         
         if (!row.c || row.c.length === 0) {
