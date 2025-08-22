@@ -2,17 +2,20 @@
 function createShopCard(shop) {
     return `
         <div class="commerce-card" onclick="showShopDetails(${allShops.indexOf(shop)})">
-            <div class="commerce-header">
-                <h3>${shop.nom}</h3>
-<div class="commerce-location">
-    <i class="fas fa-map-marker-alt"></i>
-    ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}
+
+<div class="commerce-header">
+    <h3>${shop.nom}</h3>
+    ${shop.descripcio_comerc ? `
+        <p style="margin-top: 0.8rem; font-size: 0.95rem; opacity: 0.9; font-style: italic;">
+            ${shop.descripcio_comerc}
+        </p>
+    ` : ''}
+    <div class="commerce-location" style="margin-top: 1.5rem;">
+        <i class="fas fa-map-marker-alt"></i>
+        ${shop.municipi}${shop.comarca ? ', ' + shop.comarca : ''}
+    </div>
 </div>
-${shop.descripcio_comerc ? `
-    <p style="margin-top: 1rem; font-size: 0.95rem; opacity: 0.9; font-style: italic;">
-        ${shop.descripcio_comerc}
-    </p>
-` : ''}
+
 
 
             </div>
@@ -62,14 +65,17 @@ ${shop.descripcio_comerc ? `
                     ` : ''}
                 </div>
             </div>
-            <div class="commerce-footer">
-                <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
-                <div class="commerce-actions">
-                    ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
-                    ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
-                    ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
-                </div>
-            </div>
+<div class="commerce-footer">
+    <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
+    <div class="commerce-actions">
+        ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
+        ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
+        ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
+        <button class="action-btn" onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')"><i class="fas fa-directions"></i></button>
+    </div>
+</div>
+
+
         </div>
     `;
 }
