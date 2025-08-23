@@ -75,14 +75,29 @@ function createPopupContent(shop) {
                     </div>
                 ` : ''}
                 <div class="popup-actions">
-                    <button class="popup-btn popup-btn-primary" onclick="showShopDetails(${allShops.indexOf(shop)})">
+                    <button class="popup-btn popup-btn-primary" onclick="showShopDetails(${allShops.indexOf(shop)})" style="width: 100%; margin-bottom: 0.8rem;">
                         <i class="fas fa-info-circle"></i> Més info
                     </button>
-                    ${shop.telefon ? `
-                        <button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'">
-                            <i class="fas fa-phone"></i> Trucar
+                    <div style="display: flex; gap: 0.5rem;">
+                        ${shop.telefon ? `
+                            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'" style="flex: 1;">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        ` : ''}
+                        ${shop.email ? `
+                            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='mailto:${shop.email}'" style="flex: 1;">
+                                <i class="fas fa-envelope"></i>
+                            </button>
+                        ` : ''}
+                        ${shop.web ? `
+                            <button class="popup-btn popup-btn-secondary" onclick="window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')" style="flex: 1;">
+                                <i class="fas fa-globe"></i>
+                            </button>
+                        ` : ''}
+                        <button class="popup-btn popup-btn-secondary" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')" style="flex: 1;">
+                            <i class="fas fa-directions"></i>
                         </button>
-                    ` : ''}
+                    </div>
                 </div>
             </div>
         </div>
