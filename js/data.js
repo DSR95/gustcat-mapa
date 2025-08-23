@@ -1,33 +1,26 @@
 // Carregar dades de Google Sheets
 async function loadShopsFromGoogleSheets() {
     try {
-        console.log('Loading shops from Google Sheets...');
+        console.log('Loading shops from secure API...');
         showLoadingSpinner();
         
-        const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}`;
-        console.log('Fetching URL:', url);
-        
-        const response = await fetch(url);
+        // Usar la nostra API privada
+        const response = await fetch('/api/shops');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const text = await response.text();
-        console.log('Response text length:', text.length);
+        const data = await response.json();
+        console.log('Received data from API:', data);
         
-        if (!text.includes('google.visualization.Query.setResponse')) {
-            throw new Error('Invalid Google Sheets response format');
+        if (!data.success || !data.shops) {
+            throw new Error('Invalid API response format');
         }
         
-        const jsonString = text.substring(47).slice(0, -2);
-        const data = JSON.parse(jsonString);
-        
-        console.log('Parsed Google Sheets data successfully');
-        
-        allShops = await processGoogleSheetsData(data);
+        allShops = data.shops;
         
         if (allShops.length === 0) {
-            throw new Error('No valid shops found in spreadsheet');
+            throw new Error('No valid shops found');
         }
         
         filteredShops = [...allShops];
@@ -38,10 +31,10 @@ async function loadShopsFromGoogleSheets() {
         updateResultsCount();
         
         hideLoadingSpinner();
-        showSuccessMessage(`S'han carregat ${allShops.length} comerços del Google Sheet`);
+        showSuccessMessage(`S'han carregat ${allShops.length} comerços de manera segura`);
         
     } catch (error) {
-        console.error('Error loading Google Sheets data:', error);
+        console.error('Error loading shops data:', error);
         console.log('Fallback: Using sample data...');
         
         allShops = getSampleData();
@@ -53,7 +46,7 @@ async function loadShopsFromGoogleSheets() {
         updateResultsCount();
         
         hideLoadingSpinner();
-        showErrorMessage('Error carregant Google Sheet. Mostrant dades de mostra.');
+        showErrorMessage('Error carregant dades. Mostrant dades de mostra.');
     }
 }
 
