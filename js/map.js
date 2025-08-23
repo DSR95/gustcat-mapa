@@ -78,23 +78,41 @@ function createPopupContent(shop) {
                     <button class="popup-btn popup-btn-primary" onclick="showShopDetails(${allShops.indexOf(shop)})" style="width: 100%; margin-bottom: 0.8rem;">
                         <i class="fas fa-info-circle"></i> Més info
                     </button>
-                    <div style="display: flex; gap: 0.5rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.4rem;">
                         ${shop.telefon ? `
-                            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'" style="flex: 1;">
+                            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'" style="padding: 0.8rem 0.4rem;">
                                 <i class="fas fa-phone"></i>
                             </button>
-                        ` : ''}
+                        ` : `
+                            <div style="opacity: 0.3;">
+                                <button class="popup-btn popup-btn-secondary" disabled style="padding: 0.8rem 0.4rem; opacity: 0.3;">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                            </div>
+                        `}
                         ${shop.email ? `
-                            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='mailto:${shop.email}'" style="flex: 1;">
+                            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='mailto:${shop.email}'" style="padding: 0.8rem 0.4rem;">
                                 <i class="fas fa-envelope"></i>
                             </button>
-                        ` : ''}
+                        ` : `
+                            <div style="opacity: 0.3;">
+                                <button class="popup-btn popup-btn-secondary" disabled style="padding: 0.8rem 0.4rem; opacity: 0.3;">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                            </div>
+                        `}
                         ${shop.web ? `
-                            <button class="popup-btn popup-btn-secondary" onclick="window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')" style="flex: 1;">
+                            <button class="popup-btn popup-btn-secondary" onclick="window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')" style="padding: 0.8rem 0.4rem;">
                                 <i class="fas fa-globe"></i>
                             </button>
-                        ` : ''}
-                        <button class="popup-btn popup-btn-secondary" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')" style="flex: 1;">
+                        ` : `
+                            <div style="opacity: 0.3;">
+                                <button class="popup-btn popup-btn-secondary" disabled style="padding: 0.8rem 0.4rem; opacity: 0.3;">
+                                    <i class="fas fa-globe"></i>
+                                </button>
+                            </div>
+                        `}
+                        <button class="popup-btn popup-btn-secondary" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')" style="padding: 0.8rem 0.4rem;">
                             <i class="fas fa-directions"></i>
                         </button>
                     </div>
