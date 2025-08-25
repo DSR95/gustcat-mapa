@@ -40,7 +40,7 @@ header {
     height: 150%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
 }
 
 .logo-icon img {
