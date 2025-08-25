@@ -24,7 +24,7 @@ header {
     text-decoration: none;
     color: var(--text-dark);
     transition: var(--transition);
-    width: 100%;
+    width: 50%;
     height: 100%;
 }
 
@@ -42,7 +42,7 @@ header {
 
 .logo-icon img {
     height: 100px;
-    width: auto;
+    width: 100px;
     max-width: 100%;
     object-fit: contain;
 }
