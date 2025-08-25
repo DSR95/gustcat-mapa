@@ -21,16 +21,17 @@ async function loadShopsFromGoogleSheets() {
             throw new Error('No valid shops found');
         }
         
-        for (let shop of allShops) {
-            if (!shop.lat || !shop.lng) {
-                const fullAddress = `${shop.adreca} ${shop.codi_postal} ${shop.municipi}, Spain`.trim();
-                const coords = await geocodeAddress(fullAddress || `${shop.municipi}, Spain`);
-                if (coords) {
-                    shop.lat = coords.lat;
-                    shop.lng = coords.lng;
-                }
-            }
+for (let shop of allShops) {
+    if (!shop.lat || !shop.lng) {
+        const country = (shop.comarca === 'Catalunya Nord') ? 'France' : 'Spain';
+        const fullAddress = `${shop.adreca} ${shop.codi_postal} ${shop.municipi}, ${country}`.trim();
+        const coords = await geocodeAddress(fullAddress || `${shop.municipi}, ${country}`);
+        if (coords) {
+            shop.lat = coords.lat;
+            shop.lng = coords.lng;
         }
+    }
+}
         
         filteredShops = [...allShops];
         
@@ -152,8 +153,9 @@ if (rows[1] && rows[1].c) {
                 lng: null
             };
             
-            const fullAddress = `${adreca} ${codi_postal} ${municipi}, Spain`.trim();
-            const coords = await geocodeAddress(fullAddress || `${municipi}, Spain`);
+            const country = (comarca === 'Catalunya Nord') ? 'France' : 'Spain';
+            const fullAddress = `${adreca} ${codi_postal} ${municipi}, ${country}`.trim();
+            const coords = await geocodeAddress(fullAddress || `${municipi}, ${country}`);
             if (coords) {
                 shop.lat = coords.lat;
                 shop.lng = coords.lng;
