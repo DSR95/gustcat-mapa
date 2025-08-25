@@ -131,6 +131,10 @@
 
 /* Mòbils */
 @media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+    
     header {
         padding: 0.5rem 0;
     }
@@ -140,6 +144,8 @@
         height: auto;
         padding: 1rem;
         gap: 1rem;
+        width: 100%;
+        max-width: 100%;
     }
     
     .logo {
@@ -183,38 +189,74 @@
     }
     
     .search-section {
-        padding: 1.5rem;
+        padding: 1rem;
         margin: -2rem 1rem 2rem;
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
+        box-sizing: border-box;
     }
     
     .search-container {
         grid-template-columns: 1fr;
         gap: 1rem;
+        width: 100%;
+    }
+    
+    .search-input,
+    select {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        font-size: 16px;
     }
     
     .map-container {
         grid-template-columns: 1fr;
         padding: 0 1rem;
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
     }
     
     .filters-sidebar {
         height: auto;
         margin-bottom: 1rem;
         padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .category-filters {
         display: grid;
         grid-template-columns: 1fr;
         gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .category-filter {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0.8rem;
+    }
+    
+    .category-filter label {
+        font-size: 0.85rem;
+        width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
     
     #map {
         height: 400px;
+        width: 100%;
     }
     
     .results-section {
         padding: 0 1rem 2rem;
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
     }
     
     .results-header {
@@ -222,15 +264,21 @@
         gap: 1rem;
         text-align: center;
         padding: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .commerce-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+        width: 100%;
     }
     
     .commerce-card {
         min-height: auto;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .commerce-header {
@@ -262,10 +310,14 @@
     
     .form-card {
         padding: 1.5rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .form-grid {
         grid-template-columns: 1fr;
+        width: 100%;
     }
     
     .modal-content {
@@ -280,6 +332,8 @@
     
     .section {
         padding: 0 1rem;
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
     }
     
     .footer-content {
