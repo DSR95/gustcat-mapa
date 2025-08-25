@@ -16,7 +16,7 @@ header {
     margin: 0 auto;
     display: flex;
     align-items: center;
-    height: 80px;
+    height: 85px;
 }
 
 .logo {
@@ -27,7 +27,7 @@ header {
     color: var(--text-dark);
     transition: var(--transition);
     width: 50%;
-    height: 120px;
+    height: 85px;
     padding: 10px 20px;
 }
 
@@ -44,7 +44,7 @@ header {
 }
 
 .logo-icon img {
-    height: 100px;
+    height: 65px;
     width: auto;
     max-width: 100%;
     object-fit: contain;
@@ -56,7 +56,7 @@ nav {
     align-items: center;
     justify-content: center;
     padding: 0 2rem;
-    height: 120px;
+    height: 85px;
 }
 
 nav ul {
