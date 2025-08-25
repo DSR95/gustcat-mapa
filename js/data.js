@@ -176,11 +176,11 @@ function getSampleData() {
             web: "www.canroca.cat",
             producte1_nom: "Llonganissa de Vic IGP",
             producte1_categoria: "Embotits propis",
-            producte1_preu: "18€/kg",
+          
             producte1_descripcio: "Llonganissa artesana amb Indicació Geogràfica Protegida, elaborada segons la recepta tradicional.",
             producte2_nom: "Botifarra de perol",
             producte2_categoria: "Embotits propis",
-            producte2_preu: "14€/kg",
+           
             producte2_descripcio: "Botifarra cuita al perol seguint la recepta de l'àvia.",
             lat: 41.9297,
             lng: 2.2544
@@ -195,11 +195,11 @@ function getSampleData() {
             web: "www.formatgeriapirineu.cat",
             producte1_nom: "Formatge de tupí",
             producte1_categoria: "Formatges i làctics",
-            producte1_preu: "22€/kg",
+            
             producte1_descripcio: "Formatge fermentat típic de la Cerdanya, elaborat amb llet crua d'ovella.",
             producte2_nom: "Mató de muntanya",
             producte2_categoria: "Formatges i làctics",
-            producte2_preu: "8€/unitat",
+           
             producte2_descripcio: "Mató fresc elaborat diàriament amb llet de vaca del Pirineu.",
             lat: 42.4318,
             lng: 1.9286
@@ -214,11 +214,10 @@ function getSampleData() {
             web: "www.vallmontsant.cat",
             producte1_nom: "Vi negre DO Montsant",
             producte1_categoria: "Begudes artesanes (vi, cava, licors, cerveses)",
-            producte1_preu: "15€/ampolla",
+            
             producte1_descripcio: "Vi negre de garnatxa i carinyena amb 12 mesos de criança en bóta de roure.",
             producte2_nom: "Oli d'oliva verge extra",
             producte2_categoria: "Oli i olives",
-            producte2_preu: "18€/litre",
             producte2_descripcio: "Oli d'arbequina de primera premsada en fred.",
             lat: 41.1461,
             lng: 0.8256
