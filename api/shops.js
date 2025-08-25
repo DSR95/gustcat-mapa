@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Només permetre GET requests
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -12,7 +11,6 @@ export default async function handler(req, res) {
       throw new Error('Missing environment variables');
     }
 
-    // Llegir Google Sheet
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
     
     const response = await fetch(url);
@@ -28,10 +26,8 @@ export default async function handler(req, res) {
     const jsonString = text.substring(47).slice(0, -2);
     const data = JSON.parse(jsonString);
     
-    // Processar les dades
     const shops = await processShopsData(data);
     
-    // Filtrar només dades públiques
     const publicShops = shops.map(shop => ({
       nom: shop.nom,
       comarca: shop.comarca,
@@ -50,16 +46,14 @@ export default async function handler(req, res) {
       producte2_categoria: shop.producte2_categoria,
       producte2_descripcio: shop.producte2_descripcio,
       producte2_foto: shop.producte2_foto,
-      lat: shop.lat,
-      lng: shop.lng
+      lat: null,
+      lng: null
     }));
 
-    // Configurar headers CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    // Retornar dades
     res.status(200).json({
       success: true,
       count: publicShops.length,
@@ -75,7 +69,6 @@ export default async function handler(req, res) {
   }
 }
 
-// Funció per processar dades (copiada del teu codi actual)
 async function processShopsData(data) {
   if (!data.table || !data.table.rows) {
     throw new Error('Invalid Google Sheets data structure');
@@ -101,7 +94,6 @@ async function processShopsData(data) {
     const nom = getCellValue(0);
     const actiu = getCellValue(18);
     
-    // Només incloure comerços actius
     const isActive = actiu === 'Sí' || actiu === 'En seguiment';
     
     if (nom && isActive) {
@@ -127,14 +119,6 @@ async function processShopsData(data) {
         lng: null
       };
       
-      // Geocodificar adreça
-      const fullAddress = `${shop.adreca} ${shop.codi_postal} ${shop.municipi}, Spain`.trim();
-      const coords = await geocodeAddress(fullAddress || `${shop.municipi}, Spain`);
-      if (coords) {
-        shop.lat = coords.lat;
-        shop.lng = coords.lng;
-      }
-      
       shops.push(shop);
     }
   }
@@ -142,7 +126,6 @@ async function processShopsData(data) {
   return shops;
 }
 
-// Funcions auxiliars
 function convertGoogleDriveUrl(url) {
   if (!url) return '';
   
@@ -159,36 +142,4 @@ function convertGoogleDriveUrl(url) {
   }
   
   return url;
-}
-
-const geocodeCache = new Map();
-
-async function geocodeAddress(address) {
-  if (geocodeCache.has(address)) {
-    return geocodeCache.get(address);
-  }
-  
-  try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
-    const data = await response.json();
-    
-    if (data && data.length > 0) {
-      const coords = {
-        lat: parseFloat(data[0].lat),
-        lng: parseFloat(data[0].lon)
-      };
-      geocodeCache.set(address, coords);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      return coords;
-    }
-  } catch (error) {
-    console.error('Error geocoding:', error);
-  }
-  
-  const randomCoords = {
-    lat: 41.5 + Math.random() * 1.5,
-    lng: 0.5 + Math.random() * 2.5
-  };
-  geocodeCache.set(address, randomCoords);
-  return randomCoords;
 }
