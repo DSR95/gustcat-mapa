@@ -3,21 +3,21 @@
 /* Pantalles Grans (Desktop) */
 @media (min-width: 1201px) {
     .header-content {
-        height: 120px;
+        height: 85px;
     }
     
     .logo {
         width: 50%;
-        height: 120px;
+        height: 85px;
     }
     
     .logo-icon img {
-        height: 100px;
+        height: 65px;
     }
     
     nav {
         width: 50%;
-        height: 120px;
+        height: 85px;
     }
 }
 
