@@ -24,24 +24,27 @@ header {
     text-decoration: none;
     color: var(--text-dark);
     transition: var(--transition);
-    background: white;
     width: 50%;
     height: 100%;
-    border-radius: 0 15px 0 0;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
 .logo:hover {
     transform: none;
-    background: #f8f8f8;
 }
 
 .logo-icon {
-    width: auto;
+    width: 100%;
     height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.logo-icon img {
+    height: 80px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
 }
 
 nav {
