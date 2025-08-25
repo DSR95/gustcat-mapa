@@ -128,8 +128,8 @@ async function processShopsData(data) {
       };
       
       // Geocodificar adreça
-      const fullAddress = `${shop.adreca} ${shop.codi_postal} ${shop.municipi}, Catalunya`.trim();
-      const coords = await geocodeAddress(fullAddress || `${shop.municipi}, Catalunya`);
+      const fullAddress = `${shop.adreca} ${shop.codi_postal} ${shop.municipi}, Spain`.trim();
+      const coords = await geocodeAddress(fullAddress || `${shop.municipi}, Spain`);
       if (coords) {
         shop.lat = coords.lat;
         shop.lng = coords.lng;
