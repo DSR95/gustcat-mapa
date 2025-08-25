@@ -1,8 +1,9 @@
 /* Header */
+/* Header */
 header {
     background: var(--bg-white);
     color: var(--text-dark);
-    padding: 1.2rem 0;
+    padding: 0.5rem 0;
     box-shadow: var(--shadow-medium);
     position: sticky;
     top: 0;
@@ -14,7 +15,8 @@ header {
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
-    height: 80px;
+    align-items: center;
+    height: 120px;
 }
 
 .logo {
@@ -25,7 +27,8 @@ header {
     color: var(--text-dark);
     transition: var(--transition);
     width: 50%;
-    height: 100%;
+    height: 120px;
+    padding: 10px 20px;
 }
 
 .logo:hover {
@@ -34,10 +37,10 @@ header {
 
 .logo-icon {
     width: 100%;
-    height: 100px;
+    height: 100%;
     display: flex;
-    align-items: left;
-    justify-content: left;
+    align-items: center;
+    justify-content: center;
 }
 
 .logo-icon img {
@@ -53,7 +56,7 @@ nav {
     align-items: center;
     justify-content: center;
     padding: 0 2rem;
-    height: 100px;
+    height: 120px;
 }
 
 nav ul {
