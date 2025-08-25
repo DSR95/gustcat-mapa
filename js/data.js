@@ -1,10 +1,8 @@
-// Carregar dades de Google Sheets
 async function loadShopsFromGoogleSheets() {
     try {
         console.log('Loading shops from secure API...');
         showLoadingSpinner();
         
-        // Usar la nostra API privada
         const response = await fetch('/api/shops');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -23,6 +21,17 @@ async function loadShopsFromGoogleSheets() {
             throw new Error('No valid shops found');
         }
         
+        for (let shop of allShops) {
+            if (!shop.lat || !shop.lng) {
+                const fullAddress = `${shop.adreca} ${shop.codi_postal} ${shop.municipi}, Spain`.trim();
+                const coords = await geocodeAddress(fullAddress || `${shop.municipi}, Spain`);
+                if (coords) {
+                    shop.lat = coords.lat;
+                    shop.lng = coords.lng;
+                }
+            }
+        }
+        
         filteredShops = [...allShops];
         
         updateFilters();
@@ -31,7 +40,7 @@ async function loadShopsFromGoogleSheets() {
         updateResultsCount();
         
         hideLoadingSpinner();
-        showSuccessMessage(`S'han carregat ${allShops.length} comerços col·laboradors`);
+        showSuccessMessage(`${allShops.length} comerços carregats correctament`);
         
     } catch (error) {
         console.error('Error loading shops data:', error);
@@ -50,7 +59,6 @@ async function loadShopsFromGoogleSheets() {
     }
 }
 
-// Processar dades de Google Sheets
 async function processGoogleSheetsData(data) {
     console.log('Raw Google Sheets data:', data);
     
@@ -66,7 +74,6 @@ if (rows[0] && rows[0].c) {
     console.log('Sheet headers with indices:', headers);
 }
 
-// Debug fila 1 (primera fila de dades)
 if (rows[1] && rows[1].c) {
     const firstRow = rows[1].c.map((cell, index) => `${index}: ${cell?.v || 'empty'}`);
     console.log('First data row:', firstRow);
@@ -145,17 +152,17 @@ if (rows[1] && rows[1].c) {
                 lng: null
             };
             
-            const fullAddress = `${adreca} ${codi_postal} ${municipi}, Catalunya`.trim();
-            const coords = await geocodeAddress(fullAddress || `${municipi}, Catalunya`);
+            const fullAddress = `${adreca} ${codi_postal} ${municipi}, Spain`.trim();
+            const coords = await geocodeAddress(fullAddress || `${municipi}, Spain`);
             if (coords) {
                 shop.lat = coords.lat;
                 shop.lng = coords.lng;
             }
             
             shops.push(shop);
-            console.log(`✅ Added shop: ${shop.nom} (Status: ${actiu})`);
+            console.log(`Added shop: ${shop.nom} (Status: ${actiu})`);
         } else {
-            console.log(`⚠ Skipped row ${i} - Name: "${nom}", Active: "${actiu}"`);
+            console.log(`Skipped row ${i} - Name: "${nom}", Active: "${actiu}"`);
         }
     }
     
@@ -163,7 +170,6 @@ if (rows[1] && rows[1].c) {
     return shops;
 }
 
-// Dades de mostra
 function getSampleData() {
     return [
         {
