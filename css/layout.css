@@ -14,7 +14,7 @@ header {
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
-    height: 100px;
+    height: 80px;
 }
 
 .logo {
@@ -24,7 +24,7 @@ header {
     text-decoration: none;
     color: var(--text-dark);
     transition: var(--transition);
-    width: 50%;
+    width: 100%;
     height: 100%;
 }
 
