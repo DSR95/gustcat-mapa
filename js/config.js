@@ -10,7 +10,7 @@ let searchTimeout;
 // Configuració - EMOJIS ACTUALITZATS
 const CONFIG = {
     SHEET_ID: '1sR3obYw4gI9LguXt3__a6TaVweQN8vzLvVfEon37JPI',
-    SHEET_NAME: 'Hoja 1',
+    SHEET_NAME: 'Full 1',
     MAP_CENTER: [41.8204, 1.8676],
     MAP_ZOOM: 8,
     CATEGORY_EMOJIS: {
