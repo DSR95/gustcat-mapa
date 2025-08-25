@@ -31,7 +31,7 @@ async function loadShopsFromGoogleSheets() {
         updateResultsCount();
         
         hideLoadingSpinner();
-        showSuccessMessage(`S'han carregat ${allShops.length} comerços de manera segura`);
+        showSuccessMessage(`S'han carregat ${allShops.length} comerços col·laboradors`);
         
     } catch (error) {
         console.error('Error loading shops data:', error);
