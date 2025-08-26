@@ -91,33 +91,33 @@ async function processShopsData(data) {
       return '';
     };
     
-    const nom = getCellValue(0);
-    const actiu = getCellValue(18);
+const actiu = getCellValue(0);
+const nom = getCellValue(1);
     
     const isActive = actiu === 'Sí' || actiu === 'En seguiment';
     
     if (nom && isActive) {
-      const shop = {
-        nom: nom,
-        comarca: getCellValue(14),
-        municipi: getCellValue(13),
-        adreca: getCellValue(11),
-        codi_postal: getCellValue(12),
-        telefon: getCellValue(15),
-        email: getCellValue(16),
-        web: getCellValue(17),
-        descripcio_comerc: getCellValue(2),
-        producte1_nom: getCellValue(3),
-        producte1_categoria: getCellValue(4),
-        producte1_descripcio: getCellValue(6),
-        producte1_foto: convertGoogleDriveUrl(getCellValue(5)),
-        producte2_nom: getCellValue(7),
-        producte2_categoria: getCellValue(8),
-        producte2_descripcio: getCellValue(10),
-        producte2_foto: convertGoogleDriveUrl(getCellValue(9)),
-        lat: null,
-        lng: null
-      };
+  const shop = {
+  nom: nom,
+  comarca: getCellValue(15), // abans era 14
+  municipi: getCellValue(14), // abans era 13
+  adreca: getCellValue(12),   // abans era 11
+  codi_postal: getCellValue(13), // abans era 12
+  telefon: getCellValue(16),  // abans era 15
+  email: getCellValue(17),    // abans era 16
+  web: getCellValue(18),      // abans era 17
+  descripcio_comerc: getCellValue(3), // abans era 2
+  producte1_nom: getCellValue(4),     // abans era 3
+  producte1_categoria: getCellValue(5), // abans era 4
+  producte1_descripcio: getCellValue(7), // abans era 6
+  producte1_foto: convertGoogleDriveUrl(getCellValue(6)), // abans era 5
+  producte2_nom: getCellValue(8),     // abans era 7
+  producte2_categoria: getCellValue(9), // abans era 8
+  producte2_descripcio: getCellValue(11), // abans era 10
+  producte2_foto: convertGoogleDriveUrl(getCellValue(10)), // abans era 9
+  lat: null,
+  lng: null
+};
       
       shops.push(shop);
     }
