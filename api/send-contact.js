@@ -36,12 +36,12 @@ Data: ${new Date().toLocaleString('ca-ES')}
 IP: ${req.headers['x-forwarded-for'] || 'No detectada'}
     `;
 
-    const result = await resend.emails.send({
-      from: 'GustCat <noreply@gustcat.cat>',
-      to: [process.env.CONTACT_EMAIL],
-      subject: `Nova sol·licitud de registre: ${formData.nom}`,
-      text: emailContent,
-    });
+const result = await resend.emails.send({
+  from: 'GustCat <onboarding@resend.dev>',
+  to: [process.env.CONTACT_EMAIL],
+  subject: `Nova sol·licitud de registre: ${formData.nom}`,
+  text: emailContent,
+});
 
     console.log('Email enviat:', result);
     
