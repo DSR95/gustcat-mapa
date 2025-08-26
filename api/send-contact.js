@@ -1,3 +1,16 @@
+// A l'inici de api/send-contact.js
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Dins de la funció handler, després de construir emailContent:
+await resend.emails.send({
+  from: 'GustCat <noreply@gustcat.cat>',
+  to: [process.env.CONTACT_EMAIL],
+  subject: `Nova sol·licitud de registre: ${formData.nom}`,
+  text: emailContent,
+});
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
