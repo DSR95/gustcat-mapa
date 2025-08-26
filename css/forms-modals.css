@@ -65,16 +65,19 @@
     margin-top: 1.5rem;
 }
 
-.search-input {
-    padding: 1rem 1.5rem;
+.search-input,
+select {
+    padding: 1.2rem 1.8rem;
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
-    font-size: 1rem;
+    font-size: 1.1rem;
     transition: var(--transition);
     background: var(--bg-light);
+    min-height: 50px;
 }
 
-.search-input:focus {
+.search-input:focus,
+select:focus {
     outline: none;
     border-color: var(--accent-color);
     background: var(--bg-white);
