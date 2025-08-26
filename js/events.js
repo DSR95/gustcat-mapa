@@ -67,21 +67,51 @@ function setupEventListeners() {
 }
 
 // Gestionar enviament del formulari
-function handleRegisterSubmit(e) {
+async function handleRegisterSubmit(e) {
     e.preventDefault();
     
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.innerHTML;
     
-    console.log('Dades del formulari:', data);
+    // Mostrar estat de carregament
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviant...';
+    submitButton.disabled = true;
     
-    showSuccessMessage('Sol·licitud enviada correctament! Ens posarem en contacte aviat.');
-    
-    e.target.reset();
-    
-    setTimeout(() => {
-        showTab('inici');
-    }, 3000);
+    try {
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        console.log('Enviant sol·licitud:', data);
+        
+        const response = await fetch('/api/send-contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showSuccessMessage('Sol·licitud enviada correctament! Ens posarem en contacte aviat.');
+            e.target.reset();
+            
+            setTimeout(() => {
+                showTab('inici');
+            }, 3000);
+        } else {
+            throw new Error(result.message || 'Error enviant la sol·licitud');
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showErrorMessage('Error enviant la sol·licitud. Proveu de nou més tard.');
+    } finally {
+        // Restaurar botó
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+    }
 }
 
 // Mostrar missatges
