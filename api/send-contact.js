@@ -1,15 +1,4 @@
-// A l'inici de api/send-contact.js
 import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Dins de la funció handler, després de construir emailContent:
-await resend.emails.send({
-  from: 'GustCat <noreply@gustcat.cat>',
-  to: [process.env.CONTACT_EMAIL],
-  subject: `Nova sol·licitud de registre: ${formData.nom}`,
-  text: emailContent,
-});
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,9 +6,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const formData = req.body;
     
-    // Construir el contingut del correu
     const emailContent = `
 NOVA SOL·LICITUD DE REGISTRE - GUSTCAT
 
@@ -43,19 +32,18 @@ Categoria: ${formData.producte2_categoria || 'No especificada'}
 Descripció: ${formData.producte2_descripcio || 'No especificada'}
 
 === INFORMACIÓ TÈCNICA ===
-Data de sol·licitud: ${new Date().toLocaleString('ca-ES')}
-IP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}
-User Agent: ${req.headers['user-agent']}
-
----
-Aquesta sol·licitud s'ha generat automàticament des de GustCat.
+Data: ${new Date().toLocaleString('ca-ES')}
+IP: ${req.headers['x-forwarded-for'] || 'No detectada'}
     `;
 
-    // Aquí usariem un servei d'email com Resend, SendGrid, etc.
-    // Per simplicitat, retornem èxit (després cal configurar el servei real)
-    
-    console.log('Nova sol·licitud rebuda:', formData);
-    console.log('Email content:', emailContent);
+    const result = await resend.emails.send({
+      from: 'GustCat <noreply@gustcat.cat>',
+      to: [process.env.CONTACT_EMAIL],
+      subject: `Nova sol·licitud de registre: ${formData.nom}`,
+      text: emailContent,
+    });
+
+    console.log('Email enviat:', result);
     
     res.status(200).json({
       success: true,
@@ -63,7 +51,7 @@ Aquesta sol·licitud s'ha generat automàticament des de GustCat.
     });
 
   } catch (error) {
-    console.error('Error sending contact form:', error);
+    console.error('Error sending email:', error);
     res.status(500).json({
       error: 'Error enviant la sol·licitud',
       message: error.message
