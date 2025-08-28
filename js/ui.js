@@ -101,23 +101,41 @@ function displayShops(shops) {
 // Actualitzar filtres
 function updateFilters() {
     const comarques = [...new Set(allShops.map(s => s.comarca).filter(Boolean))].sort();
-    const municipis = [...new Set(allShops.map(s => s.municipi).filter(Boolean))].sort();
     
     const comarcaFilter = document.getElementById('comarca-filter');
     if (comarcaFilter) {
-        comarcaFilter.innerHTML = '<option value="">📍 Totes les comarques</option>';
+        comarcaFilter.innerHTML = '<option value="">🔍 Totes les comarques</option>';
         comarques.forEach(comarca => {
             comarcaFilter.innerHTML += `<option value="${comarca}">${comarca}</option>`;
         });
     }
     
+    // Actualitzar municipis inicialment
+    updateMunicipisFilter();
+}
+
+function updateMunicipisFilter() {
+    const selectedComarca = document.getElementById('comarca-filter')?.value || '';
     const municipiFilter = document.getElementById('municipi-filter');
-    if (municipiFilter) {
-        municipiFilter.innerHTML = '<option value="">🏘️ Tots els municipis</option>';
-        municipis.forEach(municipi => {
-            municipiFilter.innerHTML += `<option value="${municipi}">${municipi}</option>`;
-        });
+    
+    if (!municipiFilter) return;
+    
+    let municipis;
+    if (selectedComarca) {
+        // Filtrar municipis per comarca seleccionada
+        municipis = [...new Set(allShops
+            .filter(shop => shop.comarca === selectedComarca)
+            .map(s => s.municipi)
+            .filter(Boolean))].sort();
+    } else {
+        // Mostrar tots els municipis
+        municipis = [...new Set(allShops.map(s => s.municipi).filter(Boolean))].sort();
     }
+    
+    municipiFilter.innerHTML = '<option value="">🏘️ Tots els municipis</option>';
+    municipis.forEach(municipi => {
+        municipiFilter.innerHTML += `<option value="${municipi}">${municipi}</option>`;
+    });
 }
 
 // Aplicar filtres
