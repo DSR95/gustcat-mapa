@@ -66,12 +66,15 @@ function createShopCard(shop) {
     <div class="commerce-category-row">
         <span class="commerce-category">${shop.producte1_categoria || 'Altres'}</span>
     </div>
-    <div class="commerce-actions-row">
-        ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
-        ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
-        ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
-        <button class="action-btn" onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')"><i class="fas fa-directions"></i></button>
-    </div>
+
+    
+<div class="commerce-actions-row">
+    ${shop.telefon ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='tel:${shop.telefon}'"><i class="fas fa-phone"></i></button>` : ''}
+    ${shop.email ? `<button class="action-btn" onclick="event.stopPropagation(); window.location.href='mailto:${shop.email}'"><i class="fas fa-envelope"></i></button>` : ''}
+    ${shop.web ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')"><i class="fas fa-globe"></i></button>` : ''}
+    ${shop.xarxes_socials ? `<button class="action-btn" onclick="event.stopPropagation(); window.open('${shop.xarxes_socials.startsWith('http') ? shop.xarxes_socials : 'https://' + shop.xarxes_socials}', '_blank')"><i class="fas fa-share-alt"></i></button>` : ''}
+    <button class="action-btn" onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')"><i class="fas fa-directions"></i></button>
+</div>
 </div>
        
         
