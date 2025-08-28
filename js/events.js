@@ -16,7 +16,12 @@ function setupEventListeners() {
     const municipiFilter = document.getElementById('municipi-filter');
     const categoriaFilter = document.getElementById('categoria-filter');
     
-    if (comarcaFilter) comarcaFilter.addEventListener('change', applyFilters);
+    if (comarcaFilter) {
+    comarcaFilter.addEventListener('change', function() {
+        updateMunicipisFilter(); // Actualitzar municipis quan canvia la comarca
+        applyFilters(); // Aplicar filtres
+    });
+}
     if (municipiFilter) municipiFilter.addEventListener('change', applyFilters);
     if (categoriaFilter) categoriaFilter.addEventListener('change', applyFilters);
     
