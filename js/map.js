@@ -125,12 +125,18 @@ function applyMapFilters() {
     
     console.log('Applying map filters for categories:', checkedCategories);
     
+    // AFEGIR AQUESTA LÍNIA DE DEBUG:
+    console.log('All shops before filter:', allShops.length);
+    
     const filtered = allShops.filter(shop => 
         checkedCategories.includes(shop.producte1_categoria) ||
         checkedCategories.includes(shop.producte2_categoria)
     );
     
-    console.log(`Map filtered: ${filtered.length} shops`);
+    // AFEGIR AQUESTA LÍNIA DE DEBUG:
+    console.log('Filtered shops:', filtered.length);
+    console.log('Catalunya Nord shops in filtered:', filtered.filter(s => s.comarca === 'Catalunya Nord').length);
+    
     addMarkersToMap(filtered);
 }
 
