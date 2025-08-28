@@ -37,6 +37,7 @@ export default async function handler(req, res) {
       telefon: shop.telefon,
       email: shop.email,
       web: shop.web,
+      xarxes_socials: shop.xarxes_socials,
       descripcio_comerc: shop.descripcio_comerc,
       producte1_nom: shop.producte1_nom,
       producte1_categoria: shop.producte1_categoria,
@@ -106,6 +107,7 @@ const nom = getCellValue(1);
   telefon: getCellValue(16),  // abans era 15
   email: getCellValue(17),    // abans era 16
   web: getCellValue(18),      // abans era 17
+  xarxes_socials: getCellValue(19), // Columna T - nova
   descripcio_comerc: getCellValue(3), // abans era 2
   producte1_nom: getCellValue(4),     // abans era 3
   producte1_categoria: getCellValue(5), // abans era 4
