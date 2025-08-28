@@ -76,6 +76,11 @@ select {
     min-height: 50px;
 }
 
+.search-input::placeholder {
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
 .search-input:focus,
 select:focus {
     outline: none;
