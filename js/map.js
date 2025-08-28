@@ -248,3 +248,31 @@ function openImageModal(imageSrc, caption) {
         };
     }
 }
+
+// Funció de debug per Catalunya Nord
+function debugCatalunyaNord() {
+    console.log('=== DEBUG CATALUNYA NORD ===');
+    
+    const nordShops = allShops.filter(shop => shop.comarca === 'Catalunya Nord');
+    console.log('Comerços Catalunya Nord:', nordShops.length);
+    
+    nordShops.forEach((shop, index) => {
+        console.log(`${index + 1}. ${shop.nom}`);
+        console.log(`   Coordenades: lat=${shop.lat}, lng=${shop.lng}`);
+        console.log(`   Categoria 1: ${shop.producte1_categoria}`);
+        console.log(`   Categoria 2: ${shop.producte2_categoria}`);
+        console.log(`   Adreça: ${shop.adreca}, ${shop.municipi}`);
+    });
+    
+    const checkedCategories = Array.from(document.querySelectorAll('#categoryFilters input:checked'))
+        .map(input => input.dataset.cat);
+    console.log('Categories filtrades actives:', checkedCategories);
+    
+    const nordFiltered = nordShops.filter(shop => 
+        checkedCategories.includes(shop.producte1_categoria) ||
+        checkedCategories.includes(shop.producte2_categoria)
+    );
+    console.log('Comerços Catalunya Nord després del filtre:', nordFiltered.length);
+    
+    console.log('=== FI DEBUG ===');
+}
