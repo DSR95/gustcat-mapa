@@ -80,38 +80,15 @@ function createPopupContent(shop) {
     <button class="popup-btn popup-btn-primary" onclick="showShopDetails(${allShops.indexOf(shop)})" style="width: 100%;">
         <i class="fas fa-info-circle"></i> Més info
     </button>
-    <div style="display: flex; gap: 0.4rem;">
-        ${shop.telefon ? `
-            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'" style="flex: 1; padding: 0.8rem 0.2rem;">
-                <i class="fas fa-phone"></i>
-            </button>
-        ` : `
-            <button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;">
-                <i class="fas fa-phone"></i>
-            </button>
-        `}
-        ${shop.email ? `
-            <button class="popup-btn popup-btn-secondary" onclick="window.location.href='mailto:${shop.email}'" style="flex: 1; padding: 0.8rem 0.2rem;">
-                <i class="fas fa-envelope"></i>
-            </button>
-        ` : `
-            <button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;">
-                <i class="fas fa-envelope"></i>
-            </button>
-        `}
-        ${shop.web ? `
-            <button class="popup-btn popup-btn-secondary" onclick="window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')" style="flex: 1; padding: 0.8rem 0.2rem;">
-                <i class="fas fa-globe"></i>
-            </button>
-        ` : `
-            <button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;">
-                <i class="fas fa-globe"></i>
-            </button>
-        `}
-        <button class="popup-btn popup-btn-secondary" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')" style="flex: 1; padding: 0.8rem 0.2rem;">
-            <i class="fas fa-directions"></i>
-        </button>
-    </div>
+
+    
+<div style="display: flex; gap: 0.4rem;">
+    ${shop.telefon ? `<button class="popup-btn popup-btn-secondary" onclick="window.location.href='tel:${shop.telefon}'" style="flex: 1; padding: 0.8rem 0.2rem;"><i class="fas fa-phone"></i></button>` : `<button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;"><i class="fas fa-phone"></i></button>`}
+    ${shop.email ? `<button class="popup-btn popup-btn-secondary" onclick="window.location.href='mailto:${shop.email}'" style="flex: 1; padding: 0.8rem 0.2rem;"><i class="fas fa-envelope"></i></button>` : `<button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;"><i class="fas fa-envelope"></i></button>`}
+    ${shop.web ? `<button class="popup-btn popup-btn-secondary" onclick="window.open('${shop.web.startsWith('http') ? shop.web : 'https://' + shop.web}', '_blank')" style="flex: 1; padding: 0.8rem 0.2rem;"><i class="fas fa-globe"></i></button>` : `<button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;"><i class="fas fa-globe"></i></button>`}
+    ${shop.xarxes_socials ? `<button class="popup-btn popup-btn-secondary" onclick="window.open('${shop.xarxes_socials.startsWith('http') ? shop.xarxes_socials : 'https://' + shop.xarxes_socials}', '_blank')" style="flex: 1; padding: 0.8rem 0.2rem;"><i class="fas fa-share-alt"></i></button>` : `<button class="popup-btn popup-btn-secondary" disabled style="flex: 1; padding: 0.8rem 0.2rem; opacity: 0.3; cursor: not-allowed;"><i class="fas fa-share-alt"></i></button>`}
+    <button class="popup-btn popup-btn-secondary" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((shop.adreca || '') + ' ' + (shop.municipi || '') + ' ' + (shop.comarca || ''))}', '_blank')" style="flex: 1; padding: 0.8rem 0.2rem;"><i class="fas fa-directions"></i></button>
+</div>
 </div>
             </div>
         </div>
