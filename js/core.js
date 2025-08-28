@@ -107,7 +107,7 @@ function initMap() {
     }
 }
 
-// Geocodificar adreça
+// Geocodificar adreça - VERSIÓ CORREGIDA
 async function geocodeAddress(address) {
     if (geocodeCache.has(address)) {
         return geocodeCache.get(address);
@@ -130,11 +130,26 @@ async function geocodeAddress(address) {
         console.error('Error geocoding:', error);
     }
     
-    // Si no es pot geocodificar, retornar coordenades aleatòries a Catalunya
-    const randomCoords = {
-        lat: 41.5 + Math.random() * 1.5,
-        lng: 0.5 + Math.random() * 2.5
-    };
+    // CORRECCIÓ: Determinar si és Catalunya Nord o Sud per les coordenades aleatòries
+    const isCatalunyaNord = address.toLowerCase().includes('france') || 
+                           address.toLowerCase().includes('francia') ||
+                           address.toLowerCase().includes('catalunya nord');
+    
+    let randomCoords;
+    if (isCatalunyaNord) {
+        // Coordenades per Catalunya Nord (França)
+        randomCoords = {
+            lat: 42.3 + Math.random() * 0.5,  // Entre Perpinyà i la frontera
+            lng: 2.7 + Math.random() * 0.6    // Pirineus Orientals
+        };
+    } else {
+        // Coordenades per Catalunya Sud (Espanya) 
+        randomCoords = {
+            lat: 41.5 + Math.random() * 1.5,
+            lng: 0.5 + Math.random() * 2.5
+        };
+    }
+    
     geocodeCache.set(address, randomCoords);
     return randomCoords;
 }
