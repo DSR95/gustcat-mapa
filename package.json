@@ -2,6 +2,7 @@
   "name": "gustcat-web",
   "version": "1.0.0",
   "dependencies": {
-    "resend": "^3.2.0"
+    "resend": "^3.2.0",
+    "googleapis": "^128.0.0"
   }
 }
