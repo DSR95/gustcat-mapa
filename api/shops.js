@@ -117,10 +117,9 @@ const nom = getCellValue(1);
   producte2_categoria: getCellValue(9), // abans era 8
   producte2_descripcio: getCellValue(11), // abans era 10
   producte2_foto: convertGoogleDriveUrl(getCellValue(10)), // abans era 9
-  lat: getCellValue(20) ? parseFloat(getCellValue(20)) : null,  // Columna U
-  lng: getCellValue(21) ? parseFloat(getCellValue(21)) : null   // Columna V
-
-    };
+lat: getCellValue(20) ? parseFloat(getCellValue(20)) : null,  // Columna U
+lng: getCellValue(21) ? parseFloat(getCellValue(21)) : null   // Columna V
+};
 
 // DEBUG: Verificar coordenades llegides
 if (shop.lat && shop.lng) {
