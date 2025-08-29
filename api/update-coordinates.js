@@ -6,12 +6,21 @@ export default async function handler(req, res) {
   try {
     const { shopIndex, lat, lng } = req.body;
     
-    // Aquí hauries d'implementar l'actualització al Google Sheets
-    // Utilitzant la Google Sheets API per escriure a les columnes U i V
+    // Per ara només logem les coordenades
+    // Més endavant implementarem l'escriptura al Google Sheets
+    console.log(`Guardant coordenades per comerç ${shopIndex}: lat=${lat}, lng=${lng}`);
     
-    res.status(200).json({ success: true });
+    // Simular èxit
+    res.status(200).json({ 
+      success: true,
+      message: 'Coordenades rebudes (encara no s\'escriuen al Sheets)'
+    });
+    
   } catch (error) {
     console.error('Error updating coordinates:', error);
-    res.status(500).json({ error: 'Failed to update coordinates' });
+    res.status(500).json({ 
+      error: 'Failed to update coordinates',
+      message: error.message 
+    });
   }
 }
