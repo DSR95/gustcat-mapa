@@ -235,3 +235,23 @@ function getSampleData() {
         }
     ];
 }
+
+// Guardar coordenades al Google Sheets
+async function saveCoordinatesToSheets(shopIndex, lat, lng) {
+    try {
+        await fetch('/api/update-coordinates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                shopIndex: shopIndex,
+                lat: lat,
+                lng: lng
+            })
+        });
+        console.log(`Coordenades guardades per comerç ${shopIndex}: ${lat}, ${lng}`);
+    } catch (error) {
+        console.error('Error guardant coordenades:', error);
+    }
+}
