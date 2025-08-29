@@ -127,7 +127,6 @@ if (shop.lat && shop.lng) {
 } else {
   console.log(`Sense coordenades per ${shop.nom}: U=${getCellValue(20)}, V=${getCellValue(21)}`);
 }
-};
       
       shops.push(shop);
     }
