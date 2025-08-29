@@ -29,6 +29,9 @@ for (let shop of allShops) {
         if (coords) {
             shop.lat = coords.lat;
             shop.lng = coords.lng;
+            
+            // Guardar coordenades al Sheets
+            saveCoordinatesToSheets(allShops.indexOf(shop), coords.lat, coords.lng);
         }
     }
 }
