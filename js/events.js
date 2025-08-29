@@ -155,7 +155,7 @@ function showLoadingSpinner() {
     const container = document.getElementById('shops-container');
     if (container) {
         container.innerHTML = `
-            <div class="loading">
+            <div class="loading" style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
                 <div class="spinner"></div>
                 Carregant comerços...
             </div>
