@@ -117,8 +117,17 @@ const nom = getCellValue(1);
   producte2_categoria: getCellValue(9), // abans era 8
   producte2_descripcio: getCellValue(11), // abans era 10
   producte2_foto: convertGoogleDriveUrl(getCellValue(10)), // abans era 9
-  lat: parseFloat(getCellValue(20)) || null,  // Columna U
-  lng: parseFloat(getCellValue(21)) || null   // Columna V
+  lat: getCellValue(20) ? parseFloat(getCellValue(20)) : null,  // Columna U
+  lng: getCellValue(21) ? parseFloat(getCellValue(21)) : null   // Columna V
+
+    };
+
+// DEBUG: Verificar coordenades llegides
+if (shop.lat && shop.lng) {
+  console.log(`Coordenades llegides per ${shop.nom}: lat=${shop.lat}, lng=${shop.lng}`);
+} else {
+  console.log(`Sense coordenades per ${shop.nom}: U=${getCellValue(20)}, V=${getCellValue(21)}`);
+}
 };
       
       shops.push(shop);
